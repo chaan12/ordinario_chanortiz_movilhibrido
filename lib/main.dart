@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'src/presentation/pages/home/home_page.dart';
 import 'src/presentation/pages/login/login_page.dart';
 
 void main() {
@@ -31,7 +32,7 @@ class MyApp extends StatelessWidget {
         // This works for code too, not just values: Most code changes can be
         // tested with just a hot reload.
       ),
-      home: const LoginPage(),
+      home: const HomePage(),
     );
   }
 }
