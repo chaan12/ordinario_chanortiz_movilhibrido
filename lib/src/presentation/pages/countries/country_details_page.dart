@@ -16,6 +16,11 @@ class CountryDetailsPage extends StatefulWidget {
 class _CountryDetailsPageState extends State<CountryDetailsPage> {
   late CountryDetailsController controller;
 
+  // Color de acento para iconos y destacados
+  final Color accentColor = const Color(0xFFF2994A);
+  // Color de fondo base (el más oscuro del gradiente) para evitar bordes blancos
+  final Color darkBackgroundColor = const Color(0xFF0F2027);
+
   @override
   void initState() {
     super.initState();
@@ -25,77 +30,342 @@ class _CountryDetailsPageState extends State<CountryDetailsPage> {
     );
 
     controller.loadCountryDetails(widget.cca2);
-    print("ABRIENDO DETAILS PARA: ${widget.cca2}");
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text("Detalles del país")),
-      body: AnimatedBuilder(
-        animation: controller,
-        builder: (context, _) {
-          if (controller.isLoading) {
-            print("DETAILS: CARGANDO...");
-            return const Center(child: CircularProgressIndicator());
-          }
-
-          if (controller.errorMessage != null) {
-            print("DETAILS ERROR: ${controller.errorMessage}");
-            return Center(
-              child: Text(
-                controller.errorMessage!,
-                style: const TextStyle(color: Colors.red, fontSize: 18),
-              ),
-            );
-          }
-
-          if (controller.country == null) {
-            print("DETAILS: SIN DATOS");
-            return const Center(child: Text("No hay datos"));
-          }
-
-          print("DETAILS RECIBIDOS: ${controller.country}");
-          final c = controller.country!;
-
-          return SingleChildScrollView(
-            padding: const EdgeInsets.all(20),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Center(child: Image.network(c.flag, height: 120)),
-                const SizedBox(height: 20),
-                Text(
-                  c.name,
-                  style: const TextStyle(
-                    fontSize: 28,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-                const SizedBox(height: 10),
-                _info("Región", c.region),
-                _info("Subregión", c.subregion),
-                _info("Capital", c.capital),
-                _info("Población", c.population?.toString()),
-                _info("Área", c.area?.toString()),
-                _info("Idiomas", c.languages?.join(", ")),
-                _info("Monedas", c.currencies?.join(", ")),
-                _info("Zonas horarias", c.timezones?.join(", ")),
-                _info("Google Maps", c.maps),
-              ],
+      backgroundColor: darkBackgroundColor,
+      extendBodyBehindAppBar: true,
+      appBar: AppBar(
+        title: const Text(
+          "Ficha de País",
+          style: TextStyle(color: Colors.white),
+        ),
+        backgroundColor: Colors.transparent,
+        elevation: 0,
+        iconTheme: const IconThemeData(color: Colors.white),
+      ),
+      body: Stack(
+        children: [
+          // 1. FONDO
+          Positioned.fill(
+            child: Image.network(
+              'https://images.unsplash.com/photo-1451187580459-43490279c0fa?q=80&w=2072&auto=format&fit=crop',
+              fit: BoxFit.cover,
             ),
-          );
-        },
+          ),
+          // 2. Overlay Oscuro
+          Positioned.fill(
+            child: Container(
+              decoration: BoxDecoration(
+                gradient: LinearGradient(
+                  begin: Alignment.topCenter,
+                  end: Alignment.bottomCenter,
+                  colors: [
+                    darkBackgroundColor.withOpacity(0.8),
+                    const Color(0xFF203A43).withOpacity(0.9),
+                    const Color(0xFF2C5364).withOpacity(0.95),
+                  ],
+                ),
+              ),
+            ),
+          ),
+
+          // 3. CONTENIDO PRINCIPAL
+          AnimatedBuilder(
+            animation: controller,
+            builder: (context, _) {
+              if (controller.isLoading) {
+                return Center(
+                  child: CircularProgressIndicator(color: accentColor),
+                );
+              }
+
+              if (controller.errorMessage != null) {
+                return Center(
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      const Icon(
+                        Icons.broken_image_outlined,
+                        color: Colors.white54,
+                        size: 50,
+                      ),
+                      Text(
+                        controller.errorMessage!,
+                        style: const TextStyle(
+                          color: Colors.redAccent,
+                          fontSize: 16,
+                        ),
+                      ),
+                    ],
+                  ),
+                );
+              }
+
+              if (controller.country == null) {
+                return const Center(
+                  child: Text(
+                    "No hay datos",
+                    style: TextStyle(color: Colors.white),
+                  ),
+                );
+              }
+
+              final c = controller.country!;
+
+              return SingleChildScrollView(
+                physics: const BouncingScrollPhysics(),
+                // CAMBIO AQUÍ: Aumentado el padding superior a 140 para bajar el contenido
+                padding: const EdgeInsets.fromLTRB(20, 140, 20, 40),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: [
+                    // --- BANDERA (Hero Image) ---
+                    Container(
+                      height: 160,
+                      width: 260,
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(20),
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.black.withOpacity(0.4),
+                            blurRadius: 20,
+                            offset: const Offset(0, 10),
+                          ),
+                        ],
+                        image: DecorationImage(
+                          image: NetworkImage(c.flag),
+                          fit: BoxFit.cover,
+                        ),
+                      ),
+                    ),
+                    const SizedBox(height: 25),
+
+                    // --- NOMBRE DEL PAÍS ---
+                    Text(
+                      c.name,
+                      textAlign: TextAlign.center,
+                      style: const TextStyle(
+                        fontSize: 32,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.white,
+                        letterSpacing: 1.5,
+                      ),
+                    ),
+                    Text(
+                      "${c.region} • ${c.subregion ?? ''}",
+                      style: TextStyle(
+                        fontSize: 16,
+                        color: accentColor,
+                        fontWeight: FontWeight.w500,
+                      ),
+                    ),
+                    const SizedBox(height: 30),
+
+                    // --- TARJETA DE INFORMACIÓN (Glass) ---
+                    Container(
+                      padding: const EdgeInsets.all(20),
+                      decoration: BoxDecoration(
+                        color: Colors.white.withOpacity(0.1),
+                        borderRadius: BorderRadius.circular(20),
+                        border: Border.all(
+                          color: Colors.white.withOpacity(0.2),
+                        ),
+                      ),
+                      child: Column(
+                        children: [
+                          // Fila 1: Capital y Población
+                          Row(
+                            children: [
+                              Expanded(
+                                child: _buildInfoItem(
+                                  Icons.location_city,
+                                  "Capital",
+                                  c.capital,
+                                ),
+                              ),
+                              Container(
+                                width: 1,
+                                height: 40,
+                                color: Colors.white24,
+                              ),
+                              Expanded(
+                                child: _buildInfoItem(
+                                  Icons.groups,
+                                  "Población",
+                                  c.population?.toString(),
+                                ),
+                              ),
+                            ],
+                          ),
+                          const Divider(color: Colors.white24, height: 30),
+
+                          // Fila 2: Área y Moneda
+                          Row(
+                            children: [
+                              Expanded(
+                                child: _buildInfoItem(
+                                  Icons.landscape,
+                                  "Área",
+                                  "${c.area?.toString()} km²",
+                                ),
+                              ),
+                              Container(
+                                width: 1,
+                                height: 40,
+                                color: Colors.white24,
+                              ),
+                              Expanded(
+                                child: _buildInfoItem(
+                                  Icons.monetization_on_outlined,
+                                  "Moneda",
+                                  c.currencies?.join(", "),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ],
+                      ),
+                    ),
+
+                    const SizedBox(height: 20),
+
+                    // --- DETALLES ADICIONALES ---
+                    _buildDetailRow(
+                      Icons.translate,
+                      "Idiomas",
+                      c.languages?.join(", "),
+                    ),
+                    _buildDetailRow(
+                      Icons.schedule,
+                      "Zonas Horarias",
+                      c.timezones?.join("\n"),
+                    ),
+
+                    const SizedBox(height: 30),
+
+                    // --- MAPAS (Botón estilo link) ---
+                    if (c.maps != null && c.maps!.isNotEmpty)
+                      Container(
+                        width: double.infinity,
+                        padding: const EdgeInsets.all(15),
+                        decoration: BoxDecoration(
+                          color: accentColor.withOpacity(0.2),
+                          borderRadius: BorderRadius.circular(15),
+                          border: Border.all(
+                            color: accentColor.withOpacity(0.5),
+                          ),
+                        ),
+                        child: Column(
+                          children: [
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                Icon(Icons.map, color: accentColor),
+                                const SizedBox(width: 10),
+                                Text(
+                                  "Ver en Google Maps",
+                                  style: TextStyle(
+                                    color: accentColor,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
+                              ],
+                            ),
+                            const SizedBox(height: 5),
+                            Text(
+                              c.maps!,
+                              style: const TextStyle(
+                                color: Colors.white38,
+                                fontSize: 10,
+                              ),
+                              textAlign: TextAlign.center,
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                            ),
+                          ],
+                        ),
+                      ),
+                  ],
+                ),
+              );
+            },
+          ),
+        ],
       ),
     );
   }
 
-  Widget _info(String title, String? value) {
+  // Widget auxiliar para items de la grilla
+  Widget _buildInfoItem(IconData icon, String label, String? value) {
+    return Column(
+      children: [
+        Icon(icon, color: Colors.white70, size: 20),
+        const SizedBox(height: 8),
+        Text(
+          label.toUpperCase(),
+          style: const TextStyle(
+            color: Colors.white38,
+            fontSize: 10,
+            letterSpacing: 1,
+          ),
+        ),
+        const SizedBox(height: 4),
+        Text(
+          value ?? "N/A",
+          textAlign: TextAlign.center,
+          style: const TextStyle(
+            color: Colors.white,
+            fontWeight: FontWeight.bold,
+            fontSize: 14,
+          ),
+          maxLines: 2,
+          overflow: TextOverflow.ellipsis,
+        ),
+      ],
+    );
+  }
+
+  // Widget auxiliar para filas completas
+  Widget _buildDetailRow(IconData icon, String title, String? value) {
     if (value == null || value.isEmpty) return const SizedBox.shrink();
 
-    return Padding(
-      padding: const EdgeInsets.only(bottom: 10),
-      child: Text("$title: $value", style: const TextStyle(fontSize: 18)),
+    return Container(
+      margin: const EdgeInsets.only(bottom: 15),
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: Colors.white.withOpacity(0.05),
+        borderRadius: BorderRadius.circular(12),
+      ),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Icon(icon, color: accentColor, size: 20),
+          const SizedBox(width: 15),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  title,
+                  style: const TextStyle(
+                    color: Colors.white70,
+                    fontWeight: FontWeight.w600,
+                    fontSize: 14,
+                  ),
+                ),
+                const SizedBox(height: 5),
+                Text(
+                  value,
+                  style: const TextStyle(color: Colors.white, fontSize: 15),
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
     );
   }
 }
