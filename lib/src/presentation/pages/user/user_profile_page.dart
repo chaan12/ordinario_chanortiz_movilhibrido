@@ -53,6 +53,7 @@ class UserProfilePage extends StatelessWidget {
                   child: CircleAvatar(
                     radius: 60,
                     backgroundImage: NetworkImage(user.image),
+                    // ignore: unnecessary_underscores
                     onBackgroundImageError: (_, __) => const Icon(Icons.person),
                   ),
                 ),

@@ -213,7 +213,7 @@ class _FavoritesPageState extends State<FavoritesPage> {
                                     c.region,
                                     style: TextStyle(
                                       color: accentColor,
-                                      fontSize: 12,
+                                      fontSize: 9,
                                       fontWeight: FontWeight.w500,
                                     ),
                                   ),

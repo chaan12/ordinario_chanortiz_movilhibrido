@@ -36,6 +36,7 @@ class _AdminDashboardPageState extends State<AdminDashboardPage> {
     final all = countriesController.allCountries;
     final langs = <String>{};
     for (var c in all) {
+      // ignore: avoid_function_literals_in_foreach_calls
       c.languages.values.forEach((lang) => langs.add(lang));
     }
     return langs.length;
