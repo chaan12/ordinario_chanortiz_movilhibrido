@@ -13,9 +13,6 @@ class CountriesController extends ChangeNotifier {
   List<CountryEntity> allCountries = []; // lista original completa
   List<CountryEntity> filteredCountries = []; // lista filtrada
 
-  // -----------------------------
-  // FILTROS ACTIVOS
-  // -----------------------------
   String searchQuery = "";
   List<String> selectedRegions = [];
   List<String> selectedLanguages = [];
@@ -23,9 +20,6 @@ class CountriesController extends ChangeNotifier {
 
   String orderBy = "name"; // name | area
 
-  // -----------------------------
-  // CARGAR PAISES
-  // -----------------------------
   Future<void> loadCountries() async {
     isLoading = true;
     notifyListeners();
@@ -42,17 +36,11 @@ class CountriesController extends ChangeNotifier {
     }
   }
 
-  // -----------------------------
-  // BÚSQUEDA POR NOMBRE
-  // -----------------------------
   void updateSearch(String value) {
     searchQuery = value.toLowerCase();
     applyFilters();
   }
 
-  // -----------------------------
-  // FILTROS
-  // -----------------------------
   void toggleRegion(String region) {
     selectedRegions.contains(region)
         ? selectedRegions.remove(region)
@@ -77,25 +65,12 @@ class CountriesController extends ChangeNotifier {
     applyFilters();
   }
 
-  // -----------------------------
-  // ORDENAR
-  // -----------------------------
   void setOrder(String type) {
     orderBy = type;
     applyFilters();
   }
 
-  // -----------------------------
-  // APLICAR TODO
-  // -----------------------------
   void applyFilters() {
-    print("🔍 APLICANDO FILTROS...");
-    print("   🔎 searchQuery = $searchQuery");
-    print("   🌍 regiones = $selectedRegions");
-    print("   🗣️ idiomas = $selectedLanguages");
-    print("   💰 monedas = $selectedCurrencies");
-    print("   🎛️ orden = $orderBy");
-
     filteredCountries = allCountries.where((country) {
       final matchesSearch =
           country.name.toLowerCase().contains(searchQuery);
@@ -123,20 +98,10 @@ class CountriesController extends ChangeNotifier {
       return result;
     }).toList();
 
-    print("📏 PRE-ORDEN (primeros 5):");
-    for (var c in filteredCountries.take(5)) {
-      print("   - ${c.name} | área=${c.area}");
-    }
-
     if (orderBy == "name") {
       filteredCountries.sort((a, b) => a.name.compareTo(b.name));
     } else if (orderBy == "name_desc") {
       filteredCountries.sort((a, b) => b.name.compareTo(a.name));
-    }
-
-    print("📏 POST-ORDEN (primeros 5):");
-    for (var c in filteredCountries.take(5)) {
-      print("   - ${c.name} | área=${c.area}");
     }
 
     notifyListeners();

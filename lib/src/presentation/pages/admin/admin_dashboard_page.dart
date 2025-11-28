@@ -17,11 +17,8 @@ class _AdminDashboardPageState extends State<AdminDashboardPage> {
   late CountriesController countriesController;
   late FavoritesController favoritesController;
 
-  // En tu código original esto estaba vacío, lo mantengo así.
-  // Idealmente debería venir de un controlador.
   List<String> deletedCountries = [];
 
-  // Colores del tema
   final Color accentColor = const Color(0xFFF2994A);
 
   @override
@@ -39,7 +36,6 @@ class _AdminDashboardPageState extends State<AdminDashboardPage> {
     final all = countriesController.allCountries;
     final langs = <String>{};
     for (var c in all) {
-      // ignore: avoid_function_literals_in_foreach_calls
       c.languages.values.forEach((lang) => langs.add(lang));
     }
     return langs.length;
@@ -74,7 +70,6 @@ class _AdminDashboardPageState extends State<AdminDashboardPage> {
       ),
       body: Stack(
         children: [
-          // 1. FONDO
           Positioned.fill(
             child: Image.network(
               'https://images.unsplash.com/photo-1451187580459-43490279c0fa?q=80&w=2072&auto=format&fit=crop',
@@ -97,7 +92,6 @@ class _AdminDashboardPageState extends State<AdminDashboardPage> {
             ),
           ),
 
-          // 2. CONTENIDO SCROLLABLE (Nueva Organización)
           SafeArea(
             child: AnimatedBuilder(
               animation: Listenable.merge([
@@ -115,7 +109,6 @@ class _AdminDashboardPageState extends State<AdminDashboardPage> {
                   padding: const EdgeInsets.fromLTRB(20, 10, 20, 120),
                   physics: const BouncingScrollPhysics(),
                   children: [
-                    // --- SECCIÓN 1: RESUMEN PRINCIPAL (HERO) ---
                     _buildSectionTitle("Resumen General"),
                     _buildHeroCard(
                       label: "Total de Países",
@@ -124,13 +117,12 @@ class _AdminDashboardPageState extends State<AdminDashboardPage> {
                     ),
                     const SizedBox(height: 20),
 
-                    // --- SECCIÓN 2: DETALLES (GRID 2x2) ---
                     _buildSectionTitle("Métricas Detalladas"),
                     GridView.count(
                       crossAxisCount: 2,
                       crossAxisSpacing: 15,
                       mainAxisSpacing: 15,
-                      shrinkWrap: true, // Importante dentro de ListView
+                      shrinkWrap: true,
                       physics: const NeverScrollableScrollPhysics(),
                       childAspectRatio: 1.1,
                       children: [
@@ -163,7 +155,6 @@ class _AdminDashboardPageState extends State<AdminDashboardPage> {
                     ),
                     const SizedBox(height: 30),
 
-                    // --- SECCIÓN 3: ADMINISTRACIÓN (ACCIONES) ---
                     _buildSectionTitle("Acciones Administrativas"),
                     _buildWideActionCard(
                       icon: Icons.settings_backup_restore,
@@ -179,7 +170,6 @@ class _AdminDashboardPageState extends State<AdminDashboardPage> {
             ),
           ),
 
-          // 3. BOTÓN FLOTANTE CERRAR SESIÓN
           Positioned(
             bottom: 30,
             left: 20,
@@ -235,8 +225,6 @@ class _AdminDashboardPageState extends State<AdminDashboardPage> {
     );
   }
 
-  // --- WIDGETS DE UI ---
-
   Widget _buildSectionTitle(String title) {
     return Padding(
       padding: const EdgeInsets.only(bottom: 10, left: 5),
@@ -252,7 +240,6 @@ class _AdminDashboardPageState extends State<AdminDashboardPage> {
     );
   }
 
-  // Tarjeta Grande Superior
   Widget _buildHeroCard({
     required String label,
     required String value,
@@ -306,7 +293,6 @@ class _AdminDashboardPageState extends State<AdminDashboardPage> {
     );
   }
 
-  // Tarjetas Pequeñas del Grid
   Widget _buildSmallStatCard({
     required IconData icon,
     required String value,
@@ -346,7 +332,6 @@ class _AdminDashboardPageState extends State<AdminDashboardPage> {
     );
   }
 
-  // Tarjeta Ancha de Acción
   Widget _buildWideActionCard({
     required IconData icon,
     required String title,

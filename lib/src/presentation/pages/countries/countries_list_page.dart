@@ -23,7 +23,7 @@ class _CountriesListPageState extends State<CountriesListPage> {
   List<String> deletedCountries = [];
 
   final Color accentColor = const Color(0xFFF2994A);
-  final Color darkGlassColor = const Color(0xFF1A2A33).withOpacity(0.95);
+  final Color darkGlassColor = const Color(0xFF1A2A33).withValues(alpha: 0.95);
 
   @override
   void initState() {
@@ -81,9 +81,9 @@ class _CountriesListPageState extends State<CountriesListPage> {
                   begin: Alignment.topCenter,
                   end: Alignment.bottomCenter,
                   colors: [
-                    const Color(0xFF0F2027).withOpacity(0.8),
-                    const Color(0xFF203A43).withOpacity(0.9),
-                    const Color(0xFF2C5364).withOpacity(0.95),
+                    const Color(0xFF0F2027).withValues(alpha: 0.8),
+                    const Color(0xFF203A43).withValues(alpha: 0.9),
+                    const Color(0xFF2C5364).withValues(alpha: 0.95),
                   ],
                 ),
               ),
@@ -153,9 +153,9 @@ class _CountriesListPageState extends State<CountriesListPage> {
           Container(
             height: 50,
             decoration: BoxDecoration(
-              color: Colors.white.withOpacity(0.1),
+              color: Colors.white.withValues(alpha: 0.1),
               borderRadius: BorderRadius.circular(30),
-              border: Border.all(color: Colors.white.withOpacity(0.1)),
+              border: Border.all(color: Colors.white.withValues(alpha: 0.1)),
             ),
             child: TextField(
               onChanged: (value) => controller.updateSearch(value),
@@ -163,7 +163,7 @@ class _CountriesListPageState extends State<CountriesListPage> {
               cursorColor: accentColor,
               decoration: InputDecoration(
                 hintText: "Buscar destino...",
-                hintStyle: TextStyle(color: Colors.white.withOpacity(0.5)),
+                hintStyle: TextStyle(color: Colors.white.withValues(alpha: 0.5)),
                 prefixIcon: Icon(Icons.search, color: accentColor),
                 border: InputBorder.none,
                 contentPadding: const EdgeInsets.symmetric(
@@ -217,11 +217,11 @@ class _CountriesListPageState extends State<CountriesListPage> {
         height: 45,
         decoration: BoxDecoration(
           color: isActive
-              ? accentColor.withOpacity(0.2)
-              : Colors.white.withOpacity(0.05),
+              ? accentColor.withValues(alpha: 0.2)
+              : Colors.white.withValues(alpha: 0.05),
           borderRadius: BorderRadius.circular(12),
           border: Border.all(
-            color: isActive ? accentColor : Colors.white.withOpacity(0.1),
+            color: isActive ? accentColor : Colors.white.withValues(alpha: 0.1),
           ),
         ),
         child: Row(
@@ -253,12 +253,12 @@ class _CountriesListPageState extends State<CountriesListPage> {
     return Container(
       margin: const EdgeInsets.only(bottom: 15),
       decoration: BoxDecoration(
-        color: Colors.white.withOpacity(0.08),
+        color: Colors.white.withValues(alpha: 0.08),
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: Colors.white.withOpacity(0.15)),
+        border: Border.all(color: Colors.white.withValues(alpha: 0.15)),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.1),
+            color: Colors.black.withValues(alpha: 0.1),
             blurRadius: 10,
             offset: const Offset(0, 4),
           ),
@@ -486,13 +486,13 @@ class _CountriesListPageState extends State<CountriesListPage> {
                 ),
                 decoration: BoxDecoration(
                   color: isSelected
-                      ? accentColor
-                      : Colors.white.withOpacity(0.05),
+                      ? accentColor.withValues(alpha: 0.2)
+                      : Colors.white.withValues(alpha: 0.05),
                   borderRadius: BorderRadius.circular(20),
                   border: Border.all(
                     color: isSelected
                         ? accentColor
-                        : Colors.white.withOpacity(0.1),
+                        : Colors.white.withValues(alpha: 0.1),
                   ),
                 ),
                 child: Text(
@@ -563,7 +563,7 @@ class _CountriesListPageState extends State<CountriesListPage> {
       leading: Container(
         padding: const EdgeInsets.all(8),
         decoration: BoxDecoration(
-          color: Colors.white.withOpacity(0.05),
+          color: Colors.white.withValues(alpha: 0.05),
           borderRadius: BorderRadius.circular(8),
         ),
         child: Icon(icon, color: Colors.white70, size: 20),
@@ -585,7 +585,7 @@ class _CountriesListPageState extends State<CountriesListPage> {
           Icon(
             Icons.search_off,
             size: 60,
-            color: Colors.white.withOpacity(0.3),
+            color: Colors.white.withValues(alpha: 0.3),
           ),
           const SizedBox(height: 10),
           const Text(

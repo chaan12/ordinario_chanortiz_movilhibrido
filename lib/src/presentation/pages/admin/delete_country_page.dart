@@ -19,7 +19,6 @@ class _DeleteCountryPageState extends State<DeleteCountryPage> {
   String searchQuery = "";
   bool showOnlyDeleted = false;
 
-  // Colores del tema
   final Color accentColor = const Color(0xFFF2994A);
 
   @override
@@ -58,7 +57,6 @@ class _DeleteCountryPageState extends State<DeleteCountryPage> {
       ),
       body: Stack(
         children: [
-          // 1. FONDO
           Positioned.fill(
             child: Image.network(
               'https://images.unsplash.com/photo-1451187580459-43490279c0fa?q=80&w=2072&auto=format&fit=crop',
@@ -72,23 +70,20 @@ class _DeleteCountryPageState extends State<DeleteCountryPage> {
                   begin: Alignment.topCenter,
                   end: Alignment.bottomCenter,
                   colors: [
-                    const Color(0xFF0F2027).withOpacity(0.8),
-                    const Color(0xFF203A43).withOpacity(0.9),
-                    const Color(0xFF2C5364).withOpacity(0.95),
+                    const Color(0xFF0F2027).withValues(alpha: 0.8),
+                    const Color(0xFF203A43).withValues(alpha: 0.9),
+                    const Color(0xFF2C5364).withValues(alpha: 0.95),
                   ],
                 ),
               ),
             ),
           ),
 
-          // 2. CONTENIDO
           SafeArea(
             child: Column(
               children: [
-                // --- HEADER: BUSCADOR Y SWITCH ---
                 _buildHeader(),
 
-                // --- LISTA ---
                 Expanded(
                   child: AnimatedBuilder(
                     animation: Listenable.merge([
@@ -102,7 +97,6 @@ class _DeleteCountryPageState extends State<DeleteCountryPage> {
                         );
                       }
 
-                      // Lógica de filtrado
                       final allCountries = countriesController.allCountries;
                       final filtered = allCountries.where((c) {
                         final matchesSearch = c.name.toLowerCase().contains(
@@ -122,7 +116,7 @@ class _DeleteCountryPageState extends State<DeleteCountryPage> {
                               Icon(
                                 Icons.filter_list_off,
                                 size: 50,
-                                color: Colors.white.withOpacity(0.3),
+                                color: Colors.white.withValues(alpha: 0.3),
                               ),
                               const SizedBox(height: 10),
                               const Text(
@@ -167,13 +161,12 @@ class _DeleteCountryPageState extends State<DeleteCountryPage> {
       margin: const EdgeInsets.only(bottom: 10),
       child: Column(
         children: [
-          // Buscador
           Container(
             height: 50,
             decoration: BoxDecoration(
-              color: Colors.white.withOpacity(0.1),
+              color: Colors.white.withValues(alpha: 0.1),
               borderRadius: BorderRadius.circular(30),
-              border: Border.all(color: Colors.white.withOpacity(0.1)),
+              border: Border.all(color: Colors.white.withValues(alpha: 0.1)),
             ),
             child: TextField(
               style: const TextStyle(color: Colors.white),
@@ -185,7 +178,7 @@ class _DeleteCountryPageState extends State<DeleteCountryPage> {
               },
               decoration: InputDecoration(
                 hintText: "Buscar para eliminar...",
-                hintStyle: TextStyle(color: Colors.white.withOpacity(0.5)),
+                hintStyle: TextStyle(color: Colors.white.withValues(alpha: 0.5)),
                 prefixIcon: Icon(Icons.search, color: accentColor),
                 border: InputBorder.none,
                 contentPadding: const EdgeInsets.symmetric(
@@ -196,18 +189,17 @@ class _DeleteCountryPageState extends State<DeleteCountryPage> {
             ),
           ),
           const SizedBox(height: 15),
-          // Toggle Switch con diseño Glass
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
             decoration: BoxDecoration(
               color: showOnlyDeleted
-                  ? Colors.redAccent.withOpacity(0.1)
-                  : Colors.white.withOpacity(0.05),
+                  ? Colors.redAccent.withValues(alpha: 0.1)
+                  : Colors.white.withValues(alpha: 0.05),
               borderRadius: BorderRadius.circular(15),
               border: Border.all(
                 color: showOnlyDeleted
-                    ? Colors.redAccent.withOpacity(0.3)
-                    : Colors.white.withOpacity(0.1),
+                    ? Colors.redAccent.withValues(alpha: 0.3)
+                    : Colors.white.withValues(alpha: 0.1),
               ),
             ),
             child: Row(
@@ -235,9 +227,8 @@ class _DeleteCountryPageState extends State<DeleteCountryPage> {
                 ),
                 Switch.adaptive(
                   value: showOnlyDeleted,
-                  activeColor: Colors.redAccent,
-                  activeTrackColor: Colors.redAccent.withOpacity(0.3),
-                  inactiveTrackColor: Colors.grey.withOpacity(0.3),
+                  activeTrackColor: Colors.redAccent.withValues(alpha: 0.3),
+                  inactiveTrackColor: Colors.grey.withValues(alpha: 0.3),
                   onChanged: (value) {
                     setState(() {
                       showOnlyDeleted = value;
@@ -257,18 +248,18 @@ class _DeleteCountryPageState extends State<DeleteCountryPage> {
       margin: const EdgeInsets.only(bottom: 15),
       decoration: BoxDecoration(
         color: isDeleted
-            ? Colors.red.withOpacity(0.1) // Fondo rojo suave si está eliminado
-            : Colors.white.withOpacity(0.08),
+            ? Colors.red.withValues(alpha: 0.1)
+            : Colors.white.withValues(alpha: 0.08),
         borderRadius: BorderRadius.circular(16),
         border: Border.all(
           color: isDeleted
-              ? Colors.redAccent.withOpacity(0.5)
-              : Colors.white.withOpacity(0.15),
+              ? Colors.redAccent.withValues(alpha: 0.5)
+              : Colors.white.withValues(alpha: 0.15),
           width: isDeleted ? 1.5 : 1,
         ),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.1),
+            color: Colors.black.withValues(alpha: 0.1),
             blurRadius: 10,
             offset: const Offset(0, 4),
           ),
@@ -278,14 +269,13 @@ class _DeleteCountryPageState extends State<DeleteCountryPage> {
         padding: const EdgeInsets.all(12.0),
         child: Row(
           children: [
-            // Bandera
             Container(
               width: 50,
               height: 35,
               decoration: BoxDecoration(
                 borderRadius: BorderRadius.circular(6),
                 image: DecorationImage(
-                  image: NetworkImage(country.flagPng), // Usando flagPng
+                  image: NetworkImage(country.flagPng),
                   fit: BoxFit.cover,
                 ),
                 boxShadow: const [
@@ -296,19 +286,17 @@ class _DeleteCountryPageState extends State<DeleteCountryPage> {
                   ),
                 ],
               ),
-              // Filtro gris si está eliminado
               child: isDeleted
                   ? Container(
                       decoration: BoxDecoration(
                         borderRadius: BorderRadius.circular(6),
-                        color: Colors.black.withOpacity(0.5),
+                        color: Colors.black.withValues(alpha: 0.5),
                       ),
                     )
                   : null,
             ),
             const SizedBox(width: 15),
 
-            // Textos
             Expanded(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -352,13 +340,12 @@ class _DeleteCountryPageState extends State<DeleteCountryPage> {
               ),
             ),
 
-            // Botón de Acción
             Container(
               decoration: BoxDecoration(
                 shape: BoxShape.circle,
                 color: isDeleted
-                    ? Colors.green.withOpacity(0.2)
-                    : Colors.red.withOpacity(0.2),
+                    ? Colors.green.withValues(alpha: 0.2)
+                    : Colors.red.withValues(alpha: 0.2),
               ),
               child: IconButton(
                 icon: Icon(

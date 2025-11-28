@@ -11,7 +11,6 @@ class UserProfilePage extends StatelessWidget {
   Widget build(BuildContext context) {
     final user = UserSession.user;
 
-    // Manejo de estado nulo con el mismo fondo para consistencia
     if (user == null) {
       return _buildScaffold(
         body: const Center(
@@ -26,15 +25,12 @@ class UserProfilePage extends StatelessWidget {
     return _buildScaffold(
       body: SingleChildScrollView(
         physics: const BouncingScrollPhysics(),
-        // Padding superior para librar AppBar e inferior para librar el Navbar flotante
         padding: const EdgeInsets.fromLTRB(20, 110, 20, 160),
         child: Column(
           children: [
-            // --- HEADER: FOTO Y NOMBRE ---
             Stack(
               alignment: Alignment.center,
               children: [
-                // Brillo detrás de la foto
                 Container(
                   width: 130,
                   height: 130,
@@ -42,14 +38,13 @@ class UserProfilePage extends StatelessWidget {
                     shape: BoxShape.circle,
                     boxShadow: [
                       BoxShadow(
-                        color: accentColor.withOpacity(0.4),
+                        color: accentColor.withValues(alpha: 0.4),
                         blurRadius: 30,
                         spreadRadius: 5,
                       )
                     ],
                   ),
                 ),
-                // Foto
                 Container(
                   decoration: BoxDecoration(
                     shape: BoxShape.circle,
@@ -65,7 +60,6 @@ class UserProfilePage extends StatelessWidget {
             ),
             const SizedBox(height: 20),
             
-            // Nombre
             Text(
               "${user.firstName} ${user.lastName}",
               textAlign: TextAlign.center,
@@ -78,7 +72,6 @@ class UserProfilePage extends StatelessWidget {
             ),
             const SizedBox(height: 8),
             
-            // Username y Rol (Badge)
             Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
@@ -90,9 +83,9 @@ class UserProfilePage extends StatelessWidget {
                 Container(
                   padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
                   decoration: BoxDecoration(
-                    color: accentColor.withOpacity(0.2),
+                    color: accentColor.withValues(alpha: 0.2),
                     borderRadius: BorderRadius.circular(20),
-                    border: Border.all(color: accentColor.withOpacity(0.5)),
+                    border: Border.all(color: accentColor.withValues(alpha: 0.5)),
                   ),
                   child: Text(
                     user.role.toUpperCase(),
@@ -109,7 +102,6 @@ class UserProfilePage extends StatelessWidget {
             
             const SizedBox(height: 30),
 
-            // --- SECCIÓN 1: DATOS DE CONTACTO ---
             _buildSectionHeader("Identidad & Contacto"),
             _buildGlassCard(
               children: [
@@ -123,7 +115,6 @@ class UserProfilePage extends StatelessWidget {
 
             const SizedBox(height: 25),
 
-            // --- SECCIÓN 2: DATOS PERSONALES ---
             _buildSectionHeader("Información Personal"),
             _buildGlassCard(
               children: [
@@ -145,7 +136,6 @@ class UserProfilePage extends StatelessWidget {
 
             const SizedBox(height: 25),
 
-            // --- SECCIÓN 3: UBICACIÓN ---
             _buildSectionHeader("Ubicación Actual"),
             _buildGlassCard(
               children: [
@@ -157,13 +147,11 @@ class UserProfilePage extends StatelessWidget {
               ],
             ),
             
-            // Botón de Cerrar Sesión (Opcional, pero común en perfil)
             const SizedBox(height: 30),
             TextButton.icon(
               onPressed: () {
-                UserSession.clear(); // 🔥 Cerrar sesión
+                UserSession.clear();
 
-                // Navegación limpia: elimina historial y vuelve al Login
                 Navigator.pushNamedAndRemoveUntil(
                   context,
                   '/login',
@@ -181,8 +169,6 @@ class UserProfilePage extends StatelessWidget {
       ),
     );
   }
-
-  // --- WIDGETS AUXILIARES ---
 
   Widget _buildScaffold({required Widget body}) {
     return Scaffold(
@@ -204,14 +190,12 @@ class UserProfilePage extends StatelessWidget {
       ),
       body: Stack(
         children: [
-          // Fondo
           Positioned.fill(
             child: Image.network(
               'https://images.unsplash.com/photo-1451187580459-43490279c0fa?q=80&w=2072&auto=format&fit=crop',
               fit: BoxFit.cover,
             ),
           ),
-          // Overlay
           Positioned.fill(
             child: Container(
               decoration: BoxDecoration(
@@ -219,9 +203,9 @@ class UserProfilePage extends StatelessWidget {
                   begin: Alignment.topCenter,
                   end: Alignment.bottomCenter,
                   colors: [
-                    darkBackgroundColor.withOpacity(0.8),
-                    const Color(0xFF203A43).withOpacity(0.9),
-                    const Color(0xFF2C5364).withOpacity(0.95),
+                    darkBackgroundColor.withValues(alpha: 0.8),
+                    const Color(0xFF203A43).withValues(alpha: 0.9),
+                    const Color(0xFF2C5364).withValues(alpha: 0.95),
                   ],
                 ),
               ),
@@ -255,12 +239,12 @@ class UserProfilePage extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
-        color: Colors.white.withOpacity(0.08),
+        color: Colors.white.withValues(alpha: 0.08),
         borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: Colors.white.withOpacity(0.1)),
+        border: Border.all(color: Colors.white.withValues(alpha: 0.1)),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.2),
+            color: Colors.black.withValues(alpha: 0.2),
             blurRadius: 10,
             offset: const Offset(0, 5),
           ),
@@ -275,12 +259,12 @@ class UserProfilePage extends StatelessWidget {
 
   Widget _buildInfoRow(IconData icon, String label, String value) {
     return Row(
-      crossAxisAlignment: CrossAxisAlignment.center, // Alineado al centro verticalmente
+      crossAxisAlignment: CrossAxisAlignment.center,
       children: [
         Container(
           padding: const EdgeInsets.all(8),
           decoration: BoxDecoration(
-            color: Colors.white.withOpacity(0.05),
+            color: Colors.white.withValues(alpha: 0.05),
             borderRadius: BorderRadius.circular(8),
           ),
           child: Icon(icon, color: Colors.white70, size: 20),
@@ -318,7 +302,7 @@ class UserProfilePage extends StatelessWidget {
   Widget _buildDivider() {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 12),
-      child: Divider(color: Colors.white.withOpacity(0.1), height: 1),
+      child: Divider(color: Colors.white.withValues(alpha: 0.1), height: 1),
     );
   }
 } 

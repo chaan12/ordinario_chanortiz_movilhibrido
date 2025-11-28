@@ -7,7 +7,6 @@ class UserEntity {
   final String role;
   final String image;
 
-  // Nuevos campos
   final int age;
   final String phone;
   final String gender;

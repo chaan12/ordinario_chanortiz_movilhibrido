@@ -20,7 +20,7 @@ class _HomePageState extends State<HomePage> {
   ];
 
   final Color accentColor = const Color(0xFFF2994A);
-  final Color darkGlassColor = const Color(0xFF1A2A33).withOpacity(0.95);
+  final Color darkGlassColor = const Color(0xFF1A2A33).withValues(alpha: 0.95);
 
   @override
   Widget build(BuildContext context) {
@@ -34,10 +34,10 @@ class _HomePageState extends State<HomePage> {
           decoration: BoxDecoration(
             color: darkGlassColor,
             borderRadius: BorderRadius.circular(25),
-            border: Border.all(color: Colors.white.withOpacity(0.1)),
+            border: Border.all(color: Colors.white.withValues(alpha: 0.1)),
             boxShadow: [
               BoxShadow(
-                color: Colors.black.withOpacity(0.3),
+                color: Colors.black.withValues(alpha: 0.3),
                 blurRadius: 20,
                 offset: const Offset(0, 10),
               ),
@@ -88,7 +88,7 @@ class _HomePageState extends State<HomePage> {
           vertical: 10,
         ),
         decoration: BoxDecoration(
-          color: isSelected ? accentColor.withOpacity(0.2) : Colors.transparent,
+          color: isSelected ? accentColor.withValues(alpha: 0.2) : Colors.transparent,
           borderRadius: BorderRadius.circular(20),
         ),
         child: Row(
