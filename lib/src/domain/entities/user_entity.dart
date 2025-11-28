@@ -1,6 +1,4 @@
-import 'package:equatable/equatable.dart';
-
-class UserEntity extends Equatable {
+class UserEntity {
   final int id;
   final String username;
   final String email;
@@ -9,7 +7,16 @@ class UserEntity extends Equatable {
   final String role;
   final String image;
 
-  const UserEntity({
+  // Nuevos campos
+  final int age;
+  final String phone;
+  final String gender;
+  final String birthDate;
+
+  final Map<String, dynamic> hair;
+  final Map<String, dynamic> address;
+
+  UserEntity({
     required this.id,
     required this.username,
     required this.email,
@@ -17,16 +24,11 @@ class UserEntity extends Equatable {
     required this.lastName,
     required this.role,
     required this.image,
+    required this.age,
+    required this.phone,
+    required this.gender,
+    required this.birthDate,
+    required this.hair,
+    required this.address,
   });
-
-  @override
-  List<Object> get props => [
-    id,
-    username,
-    email,
-    firstName,
-    lastName,
-    role,
-    image,
-  ];
 }

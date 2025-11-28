@@ -16,9 +16,7 @@ class CountryDetailsPage extends StatefulWidget {
 class _CountryDetailsPageState extends State<CountryDetailsPage> {
   late CountryDetailsController controller;
 
-  // Color de acento para iconos y destacados
   final Color accentColor = const Color(0xFFF2994A);
-  // Color de fondo base (el más oscuro del gradiente) para evitar bordes blancos
   final Color darkBackgroundColor = const Color(0xFF0F2027);
 
   @override
@@ -48,14 +46,13 @@ class _CountryDetailsPageState extends State<CountryDetailsPage> {
       ),
       body: Stack(
         children: [
-          // 1. FONDO
           Positioned.fill(
             child: Image.network(
               'https://images.unsplash.com/photo-1451187580459-43490279c0fa?q=80&w=2072&auto=format&fit=crop',
               fit: BoxFit.cover,
             ),
           ),
-          // 2. Overlay Oscuro
+
           Positioned.fill(
             child: Container(
               decoration: BoxDecoration(
@@ -63,16 +60,15 @@ class _CountryDetailsPageState extends State<CountryDetailsPage> {
                   begin: Alignment.topCenter,
                   end: Alignment.bottomCenter,
                   colors: [
-                    darkBackgroundColor.withOpacity(0.8),
-                    const Color(0xFF203A43).withOpacity(0.9),
-                    const Color(0xFF2C5364).withOpacity(0.95),
+                    darkBackgroundColor.withValues(alpha: 0.8),
+                    const Color(0xFF203A43).withValues(alpha: 0.9),
+                    const Color(0xFF2C5364).withValues(alpha: 0.95),
                   ],
                 ),
               ),
             ),
           ),
 
-          // 3. CONTENIDO PRINCIPAL
           AnimatedBuilder(
             animation: controller,
             builder: (context, _) {
@@ -115,14 +111,19 @@ class _CountryDetailsPageState extends State<CountryDetailsPage> {
 
               final c = controller.country!;
 
+              final languagesText = c.languages.values
+                  .map((e) => e.toString())
+                  .join(", ");
+
+              final googleMapsLink = c.mapUrl;
+
               return SingleChildScrollView(
                 physics: const BouncingScrollPhysics(),
-                // CAMBIO AQUÍ: Aumentado el padding superior a 140 para bajar el contenido
                 padding: const EdgeInsets.fromLTRB(20, 140, 20, 40),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
-                    // --- BANDERA (Hero Image) ---
+                    // BANDERA
                     Container(
                       height: 160,
                       width: 260,
@@ -130,20 +131,20 @@ class _CountryDetailsPageState extends State<CountryDetailsPage> {
                         borderRadius: BorderRadius.circular(20),
                         boxShadow: [
                           BoxShadow(
-                            color: Colors.black.withOpacity(0.4),
+                            color: Colors.black.withValues(alpha: 0.4),
                             blurRadius: 20,
                             offset: const Offset(0, 10),
                           ),
                         ],
                         image: DecorationImage(
-                          image: NetworkImage(c.flag),
+                          image: NetworkImage(c.flagPng),
                           fit: BoxFit.cover,
                         ),
                       ),
                     ),
+
                     const SizedBox(height: 25),
 
-                    // --- NOMBRE DEL PAÍS ---
                     Text(
                       c.name,
                       textAlign: TextAlign.center,
@@ -154,29 +155,30 @@ class _CountryDetailsPageState extends State<CountryDetailsPage> {
                         letterSpacing: 1.5,
                       ),
                     ),
+
                     Text(
-                      "${c.region} • ${c.subregion ?? ''}",
+                      "${c.region} • ${c.subregion}",
                       style: TextStyle(
                         fontSize: 16,
                         color: accentColor,
                         fontWeight: FontWeight.w500,
                       ),
                     ),
+
                     const SizedBox(height: 30),
 
-                    // --- TARJETA DE INFORMACIÓN (Glass) ---
+                    // TARJETA INFO
                     Container(
                       padding: const EdgeInsets.all(20),
                       decoration: BoxDecoration(
-                        color: Colors.white.withOpacity(0.1),
+                        color: Colors.white.withValues(alpha: 0.1),
                         borderRadius: BorderRadius.circular(20),
                         border: Border.all(
-                          color: Colors.white.withOpacity(0.2),
+                          color: Colors.white.withValues(alpha: 0.2),
                         ),
                       ),
                       child: Column(
                         children: [
-                          // Fila 1: Capital y Población
                           Row(
                             children: [
                               Expanded(
@@ -195,21 +197,21 @@ class _CountryDetailsPageState extends State<CountryDetailsPage> {
                                 child: _buildInfoItem(
                                   Icons.groups,
                                   "Población",
-                                  c.population?.toString(),
+                                  c.population.toString(),
                                 ),
                               ),
                             ],
                           ),
+
                           const Divider(color: Colors.white24, height: 30),
 
-                          // Fila 2: Área y Moneda
                           Row(
                             children: [
                               Expanded(
                                 child: _buildInfoItem(
                                   Icons.landscape,
                                   "Área",
-                                  "${c.area?.toString()} km²",
+                                  "${c.area} km²",
                                 ),
                               ),
                               Container(
@@ -221,7 +223,7 @@ class _CountryDetailsPageState extends State<CountryDetailsPage> {
                                 child: _buildInfoItem(
                                   Icons.monetization_on_outlined,
                                   "Moneda",
-                                  c.currencies?.join(", "),
+                                  c.currencies.keys.join(", ")
                                 ),
                               ),
                             ],
@@ -232,30 +234,25 @@ class _CountryDetailsPageState extends State<CountryDetailsPage> {
 
                     const SizedBox(height: 20),
 
-                    // --- DETALLES ADICIONALES ---
-                    _buildDetailRow(
-                      Icons.translate,
-                      "Idiomas",
-                      c.languages?.join(", "),
-                    ),
+                    _buildDetailRow(Icons.translate, "Idiomas", languagesText),
                     _buildDetailRow(
                       Icons.schedule,
                       "Zonas Horarias",
-                      c.timezones?.join("\n"),
+                      c.timezones.join("\n"),
                     ),
 
                     const SizedBox(height: 30),
 
-                    // --- MAPAS (Botón estilo link) ---
-                    if (c.maps != null && c.maps!.isNotEmpty)
+                    // MAPAS
+                    if (googleMapsLink.isNotEmpty)
                       Container(
                         width: double.infinity,
                         padding: const EdgeInsets.all(15),
                         decoration: BoxDecoration(
-                          color: accentColor.withOpacity(0.2),
+                          color: accentColor.withValues(alpha: 0.2),
                           borderRadius: BorderRadius.circular(15),
                           border: Border.all(
-                            color: accentColor.withOpacity(0.5),
+                            color: accentColor.withValues(alpha: 0.5),
                           ),
                         ),
                         child: Column(
@@ -276,7 +273,7 @@ class _CountryDetailsPageState extends State<CountryDetailsPage> {
                             ),
                             const SizedBox(height: 5),
                             Text(
-                              c.maps!,
+                              googleMapsLink,
                               style: const TextStyle(
                                 color: Colors.white38,
                                 fontSize: 10,
@@ -298,7 +295,6 @@ class _CountryDetailsPageState extends State<CountryDetailsPage> {
     );
   }
 
-  // Widget auxiliar para items de la grilla
   Widget _buildInfoItem(IconData icon, String label, String? value) {
     return Column(
       children: [
@@ -328,15 +324,14 @@ class _CountryDetailsPageState extends State<CountryDetailsPage> {
     );
   }
 
-  // Widget auxiliar para filas completas
-  Widget _buildDetailRow(IconData icon, String title, String? value) {
-    if (value == null || value.isEmpty) return const SizedBox.shrink();
+  Widget _buildDetailRow(IconData icon, String title, String value) {
+    if (value.isEmpty) return const SizedBox.shrink();
 
     return Container(
       margin: const EdgeInsets.only(bottom: 15),
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: Colors.white.withOpacity(0.05),
+        color: Colors.white.withValues(alpha: 0.05),
         borderRadius: BorderRadius.circular(12),
       ),
       child: Row(

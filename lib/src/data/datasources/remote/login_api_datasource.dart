@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 import '../../../data/models/user_model.dart';
+import '../../session/user_session.dart';
 
 class LoginApiDataSource {
   final String baseUrl = 'https://dummyjson.com/users';
@@ -14,7 +15,11 @@ class LoginApiDataSource {
 
       for (var user in users) {
         if (user['username'] == username && user['password'] == password) {
-          return UserModel.fromJson(user);
+          final userModel = UserModel.fromJson(user);
+
+          UserSession.setUser(userModel);
+
+          return userModel;
         }
       }
     }
