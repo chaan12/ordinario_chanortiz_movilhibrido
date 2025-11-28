@@ -17,12 +17,12 @@ class _AdminDashboardPageState extends State<AdminDashboardPage> {
   late CountriesController countriesController;
   late FavoritesController favoritesController;
 
-  // lista local de países "eliminados"
+  // En tu código original esto estaba vacío, lo mantengo así.
+  // Idealmente debería venir de un controlador.
   List<String> deletedCountries = [];
 
   // Colores del tema
   final Color accentColor = const Color(0xFFF2994A);
-  final Color darkGlassColor = const Color(0xFF1A2A33).withOpacity(0.95);
 
   @override
   void initState() {
@@ -60,7 +60,7 @@ class _AdminDashboardPageState extends State<AdminDashboardPage> {
       extendBodyBehindAppBar: true,
       appBar: AppBar(
         title: const Text(
-          "Centro de Comando",
+          "Dashboard Global",
           style: TextStyle(
             color: Colors.white,
             fontWeight: FontWeight.bold,
@@ -74,7 +74,7 @@ class _AdminDashboardPageState extends State<AdminDashboardPage> {
       ),
       body: Stack(
         children: [
-          // 1. FONDO (Imagen + Gradiente)
+          // 1. FONDO
           Positioned.fill(
             child: Image.network(
               'https://images.unsplash.com/photo-1451187580459-43490279c0fa?q=80&w=2072&auto=format&fit=crop',
@@ -97,7 +97,7 @@ class _AdminDashboardPageState extends State<AdminDashboardPage> {
             ),
           ),
 
-          // 2. CONTENIDO GRID
+          // 2. CONTENIDO SCROLLABLE (Nueva Organización)
           SafeArea(
             child: AnimatedBuilder(
               animation: Listenable.merge([
@@ -111,189 +111,302 @@ class _AdminDashboardPageState extends State<AdminDashboardPage> {
                 final totalRegions = countRegions();
                 final totalDeleted = deletedCountries.length;
 
-                return Padding(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 20,
-                    vertical: 10,
-                  ),
-                  child: GridView(
-                    physics: const BouncingScrollPhysics(),
-                    gridDelegate:
-                        const SliverGridDelegateWithFixedCrossAxisCount(
-                          crossAxisCount: 2,
-                          crossAxisSpacing: 15,
-                          mainAxisSpacing: 15,
-                          childAspectRatio: 0.85, // Tarjetas un poco más altas
+                return ListView(
+                  padding: const EdgeInsets.fromLTRB(20, 10, 20, 120),
+                  physics: const BouncingScrollPhysics(),
+                  children: [
+                    // --- SECCIÓN 1: RESUMEN PRINCIPAL (HERO) ---
+                    _buildSectionTitle("Resumen General"),
+                    _buildHeroCard(
+                      label: "Total de Países",
+                      value: "$totalCountries",
+                      icon: Icons.public,
+                    ),
+                    const SizedBox(height: 20),
+
+                    // --- SECCIÓN 2: DETALLES (GRID 2x2) ---
+                    _buildSectionTitle("Métricas Detalladas"),
+                    GridView.count(
+                      crossAxisCount: 2,
+                      crossAxisSpacing: 15,
+                      mainAxisSpacing: 15,
+                      shrinkWrap: true, // Importante dentro de ListView
+                      physics: const NeverScrollableScrollPhysics(),
+                      childAspectRatio: 1.1,
+                      children: [
+                        _buildSmallStatCard(
+                          icon: Icons.map,
+                          value: "$totalRegions",
+                          label: "Regiones",
+                          color: Colors.blueAccent,
                         ),
-                    children: [
-                      _buildStatCard(
-                        icon: Icons.public,
-                        value: totalCountries.toString(),
-                        label: "Países Totales",
-                      ),
-                      _buildStatCard(
-                        icon: Icons.map,
-                        value: totalRegions.toString(),
-                        label: "Regiones",
-                      ),
-                      _buildStatCard(
-                        icon: Icons.favorite,
-                        value: totalFavorites.toString(),
-                        label: "Favoritos",
-                      ),
-                      _buildStatCard(
-                        icon: Icons.translate,
-                        value: totalLanguages.toString(),
-                        label: "Idiomas",
-                      ),
-                      _buildStatCard(
-                        icon: Icons.delete_outline,
-                        value: totalDeleted.toString(),
-                        label: "Eliminados",
-                        isWarning: true,
-                      ),
-                      _buildActionCard(
-                        icon: Icons.remove_circle_outline,
-                        label: "Gestión de\nEliminación",
-                        onTap: () {
-                          // Navegar a tu ruta de eliminar
-                          // Navigator.pushNamed(context, "/delete_country");
-                          // Ejemplo visual temporal:
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            SnackBar(
-                              content: const Text("Navegando a eliminar..."),
-                              backgroundColor: accentColor,
-                            ),
-                          );
-                        },
-                      ),
-                    ],
-                  ),
+                        _buildSmallStatCard(
+                          icon: Icons.translate,
+                          value: "$totalLanguages",
+                          label: "Idiomas",
+                          color: Colors.purpleAccent,
+                        ),
+                        _buildSmallStatCard(
+                          icon: Icons.favorite,
+                          value: "$totalFavorites",
+                          label: "Favoritos",
+                          color: Colors.pinkAccent,
+                        ),
+                        _buildSmallStatCard(
+                          icon: Icons.delete_outline,
+                          value: "$totalDeleted",
+                          label: "Eliminados",
+                          color: Colors.orangeAccent,
+                          isWarning: true,
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 30),
+
+                    // --- SECCIÓN 3: ADMINISTRACIÓN (ACCIONES) ---
+                    _buildSectionTitle("Acciones Administrativas"),
+                    _buildWideActionCard(
+                      icon: Icons.settings_backup_restore,
+                      title: "Gestión de Eliminación",
+                      subtitle: "Restaurar o eliminar países permanentemente",
+                      onTap: () {
+                        Navigator.pushNamed(context, "/delete_country");
+                      },
+                    ),
+                  ],
                 );
               },
             ),
           ),
+
+          // 3. BOTÓN FLOTANTE CERRAR SESIÓN
+          Positioned(
+            bottom: 30,
+            left: 20,
+            right: 20,
+            child: Container(
+              height: 55,
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(15),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.red.withOpacity(0.3),
+                    blurRadius: 15,
+                    offset: const Offset(0, 8),
+                  ),
+                ],
+                gradient: LinearGradient(
+                  colors: [Colors.red.shade900, Colors.red.shade700],
+                ),
+              ),
+              child: Material(
+                color: Colors.transparent,
+                child: InkWell(
+                  borderRadius: BorderRadius.circular(15),
+                  onTap: () {
+                    Navigator.pushNamedAndRemoveUntil(
+                      context,
+                      "/login",
+                      (route) => false,
+                    );
+                  },
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: const [
+                      Icon(Icons.logout, color: Colors.white),
+                      SizedBox(width: 10),
+                      Text(
+                        "CERRAR SESIÓN",
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontWeight: FontWeight.bold,
+                          fontSize: 16,
+                          letterSpacing: 1,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ),
+          ),
         ],
       ),
     );
   }
 
-  // --- TARJETA DE ESTADÍSTICAS (KPI) ---
-  Widget _buildStatCard({
-    required IconData icon,
-    required String value,
-    required String label,
-    bool isWarning = false,
-  }) {
-    final color = isWarning ? Colors.redAccent : accentColor;
+  // --- WIDGETS DE UI ---
 
+  Widget _buildSectionTitle(String title) {
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 10, left: 5),
+      child: Text(
+        title.toUpperCase(),
+        style: TextStyle(
+          color: accentColor,
+          fontSize: 12,
+          fontWeight: FontWeight.bold,
+          letterSpacing: 1.5,
+        ),
+      ),
+    );
+  }
+
+  // Tarjeta Grande Superior
+  Widget _buildHeroCard({
+    required String label,
+    required String value,
+    required IconData icon,
+  }) {
     return Container(
+      padding: const EdgeInsets.all(25),
       decoration: BoxDecoration(
-        color: Colors.white.withOpacity(0.08),
+        color: Colors.white.withOpacity(0.1),
         borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: Colors.white.withOpacity(0.1)),
+        border: Border.all(color: Colors.white.withOpacity(0.2)),
         boxShadow: [
           BoxShadow(
             color: Colors.black.withOpacity(0.2),
-            blurRadius: 10,
+            blurRadius: 15,
             offset: const Offset(0, 5),
           ),
         ],
       ),
-      child: Padding(
-        padding: const EdgeInsets.all(20.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            // Icono en círculo
-            Container(
-              padding: const EdgeInsets.all(10),
-              decoration: BoxDecoration(
-                color: color.withOpacity(0.2),
-                shape: BoxShape.circle,
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                value,
+                style: const TextStyle(
+                  color: Colors.white,
+                  fontSize: 42,
+                  fontWeight: FontWeight.bold,
+                ),
               ),
-              child: Icon(icon, color: color, size: 24),
+              Text(
+                label,
+                style: const TextStyle(color: Colors.white70, fontSize: 16),
+              ),
+            ],
+          ),
+          Container(
+            padding: const EdgeInsets.all(15),
+            decoration: BoxDecoration(
+              color: accentColor.withOpacity(0.2),
+              shape: BoxShape.circle,
+              border: Border.all(color: accentColor.withOpacity(0.5)),
             ),
-
-            // Textos
-            Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  value,
-                  style: const TextStyle(
-                    color: Colors.white,
-                    fontSize: 32,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-                const SizedBox(height: 5),
-                Text(
-                  label.toUpperCase(),
-                  style: TextStyle(
-                    color: Colors.white.withOpacity(0.6),
-                    fontSize: 10,
-                    fontWeight: FontWeight.w600,
-                    letterSpacing: 1,
-                  ),
-                ),
-              ],
-            ),
-          ],
-        ),
+            child: Icon(icon, color: accentColor, size: 35),
+          ),
+        ],
       ),
     );
   }
 
-  // --- TARJETA DE ACCIÓN (BOTÓN) ---
-  Widget _buildActionCard({
+  // Tarjetas Pequeñas del Grid
+  Widget _buildSmallStatCard({
     required IconData icon,
+    required String value,
     required String label,
+    required Color color,
+    bool isWarning = false,
+  }) {
+    return Container(
+      padding: const EdgeInsets.all(15),
+      decoration: BoxDecoration(
+        color: Colors.white.withOpacity(0.05),
+        borderRadius: BorderRadius.circular(20),
+        border: Border.all(color: Colors.white.withOpacity(0.1)),
+      ),
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Icon(icon, color: isWarning ? Colors.redAccent : color, size: 28),
+          const SizedBox(height: 10),
+          Text(
+            value,
+            style: const TextStyle(
+              color: Colors.white,
+              fontSize: 24,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+          Text(
+            label,
+            style: TextStyle(
+              color: Colors.white.withOpacity(0.5),
+              fontSize: 12,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  // Tarjeta Ancha de Acción
+  Widget _buildWideActionCard({
+    required IconData icon,
+    required String title,
+    required String subtitle,
     required VoidCallback onTap,
   }) {
-    return GestureDetector(
-      onTap: onTap,
-      child: Container(
-        decoration: BoxDecoration(
-          // Gradiente sutil para diferenciar que es interactivo
-          gradient: LinearGradient(
-            begin: Alignment.topLeft,
-            end: Alignment.bottomRight,
-            colors: [
-              Colors.redAccent.withOpacity(0.2),
-              Colors.redAccent.withOpacity(0.05),
-            ],
-          ),
+    return Container(
+      decoration: BoxDecoration(
+        color: Colors.white.withOpacity(0.05),
+        borderRadius: BorderRadius.circular(20),
+        border: Border.all(color: Colors.white.withOpacity(0.1)),
+      ),
+      child: Material(
+        color: Colors.transparent,
+        child: InkWell(
           borderRadius: BorderRadius.circular(20),
-          border: Border.all(color: Colors.redAccent.withOpacity(0.3)),
-          boxShadow: [
-            BoxShadow(
-              color: Colors.black.withOpacity(0.2),
-              blurRadius: 10,
-              offset: const Offset(0, 5),
-            ),
-          ],
-        ),
-        child: Padding(
-          padding: const EdgeInsets.all(20.0),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Icon(icon, size: 40, color: Colors.redAccent),
-              const SizedBox(height: 15),
-              Text(
-                label,
-                textAlign: TextAlign.center,
-                style: const TextStyle(
-                  color: Colors.white,
-                  fontSize: 16,
-                  fontWeight: FontWeight.bold,
+          onTap: onTap,
+          child: Padding(
+            padding: const EdgeInsets.all(20),
+            child: Row(
+              children: [
+                Container(
+                  padding: const EdgeInsets.all(12),
+                  decoration: BoxDecoration(
+                    color: Colors.white.withOpacity(0.05),
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  child: Icon(icon, color: Colors.white, size: 24),
                 ),
-              ),
-              const SizedBox(height: 10),
-              const Icon(Icons.arrow_forward, color: Colors.white54, size: 16),
-            ],
+                const SizedBox(width: 15),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        title,
+                        style: const TextStyle(
+                          color: Colors.white,
+                          fontSize: 16,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                      const SizedBox(height: 4),
+                      Text(
+                        subtitle,
+                        style: TextStyle(
+                          color: Colors.white.withOpacity(0.5),
+                          fontSize: 12,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                const Icon(
+                  Icons.arrow_forward_ios,
+                  color: Colors.white38,
+                  size: 14,
+                ),
+              ],
+            ),
           ),
         ),
       ),

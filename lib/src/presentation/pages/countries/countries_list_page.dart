@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:ordinario_chanortiz_movilhibrido/src/presentation/controllers/countries_controller.dart';
 import 'package:ordinario_chanortiz_movilhibrido/src/presentation/controllers/favorites_controller.dart';
 import 'package:ordinario_chanortiz_movilhibrido/src/data/datasources/local/favorites_local_datasource.dart';
+import 'package:ordinario_chanortiz_movilhibrido/src/data/datasources/local/deleted_countries_local_datasource.dart';
 import 'package:ordinario_chanortiz_movilhibrido/src/domain/usecases/countries/get_all_countries_usecase.dart';
 import 'package:ordinario_chanortiz_movilhibrido/src/data/repositories_impl/country_repository_impl.dart';
 import 'package:ordinario_chanortiz_movilhibrido/src/data/datasources/remote/countries_api_datasource.dart';
@@ -18,6 +19,9 @@ class _CountriesListPageState extends State<CountriesListPage> {
   late CountriesController controller;
   late FavoritesController favController;
 
+  final deletedDataSource = DeletedCountriesLocalDataSource();
+  List<String> deletedCountries = [];
+
   final Color accentColor = const Color(0xFFF2994A);
   final Color darkGlassColor = const Color(0xFF1A2A33).withOpacity(0.95);
 
@@ -30,6 +34,10 @@ class _CountriesListPageState extends State<CountriesListPage> {
     favController = FavoritesController(FavoritesLocalDataSource());
     favController.loadFavorites();
     controller.loadCountries();
+    Future.microtask(() async {
+      deletedCountries = await deletedDataSource.getDeleted();
+      setState(() {});
+    });
   }
 
   @override
@@ -117,6 +125,9 @@ class _CountriesListPageState extends State<CountriesListPage> {
                         itemCount: controller.filteredCountries.length,
                         itemBuilder: (context, index) {
                           final country = controller.filteredCountries[index];
+                          if (deletedCountries.contains(country.cca2)) {
+                            return const SizedBox.shrink();
+                          }
                           return _buildCountryItem(country);
                         },
                       );

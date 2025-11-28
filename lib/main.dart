@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'src/presentation/pages/home/home_page.dart';
 import 'src/presentation/pages/login/login_page.dart';
 import 'src/presentation/pages/user/user_profile_page.dart';
+import 'src/presentation/pages/admin/delete_country_page.dart';
 
 void main() {
   runApp(const MyApp());
@@ -21,6 +22,7 @@ class MyApp extends StatelessWidget {
         '/login': (_) => const LoginPage(),
         '/home': (_) => const HomePage(),
         '/profile': (_) => const UserProfilePage(),
+        '/delete_country': (_) => const DeleteCountryPage(),
       },
     );
   }
