@@ -24,6 +24,12 @@ class FavoritesController extends ChangeNotifier {
     await loadFavorites();
   }
 
+  Future<void> clearFavorites() async {
+    await dataSource.clearFavorites();
+    favorites = [];
+    notifyListeners();
+  }
+
   bool isFavorite(String cca2) {
     return favorites.contains(cca2);
   }

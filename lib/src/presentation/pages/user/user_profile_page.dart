@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../../../data/session/user_session.dart';
+import '../../../data/datasources/local/favorites_local_datasource.dart';
 
 class UserProfilePage extends StatelessWidget {
   const UserProfilePage({super.key});
@@ -150,10 +151,14 @@ class UserProfilePage extends StatelessWidget {
             
             const SizedBox(height: 30),
             TextButton.icon(
-              onPressed: () {
+              onPressed: () async {
+                final favorites = FavoritesLocalDataSource();
+                await favorites.clearFavorites();
+
                 UserSession.clear();
 
                 Navigator.pushNamedAndRemoveUntil(
+                  // ignore: use_build_context_synchronously
                   context,
                   '/login',
                   (route) => false,

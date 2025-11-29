@@ -2,17 +2,16 @@
 import 'package:shared_preferences/shared_preferences.dart';
 
 class FavoritesLocalDataSource {
-  final String key = "favorite_countries";
+  static const String key = "favorite_countries";
 
   Future<List<String>> getFavorites() async {
     final prefs = await SharedPreferences.getInstance();
-    final data = prefs.getStringList(key);
-    return data ?? [];
+    return prefs.getStringList(key) ?? [];
   }
 
   Future<void> toggleFavorite(String cca2) async {
     final prefs = await SharedPreferences.getInstance();
-    List<String> favorites = prefs.getStringList(key) ?? [];
+    final favorites = prefs.getStringList(key) ?? [];
 
     if (favorites.contains(cca2)) {
       favorites.remove(cca2);
@@ -23,9 +22,8 @@ class FavoritesLocalDataSource {
     await prefs.setStringList(key, favorites);
   }
 
-  Future<bool> isFavorite(String cca2) async {
+  Future<void> clearFavorites() async {
     final prefs = await SharedPreferences.getInstance();
-    final favorites = prefs.getStringList(key) ?? [];
-    return favorites.contains(cca2);
+    await prefs.remove(key);
   }
 }
