@@ -1,12 +1,16 @@
 import 'package:flutter/material.dart';
-import 'package:ordinario_chanortiz_movilhibrido/src/presentation/controllers/countries_controller.dart';
-import 'package:ordinario_chanortiz_movilhibrido/src/presentation/controllers/favorites_controller.dart';
-import 'package:ordinario_chanortiz_movilhibrido/src/data/datasources/local/favorites_local_datasource.dart';
-import 'package:ordinario_chanortiz_movilhibrido/src/data/datasources/local/deleted_countries_local_datasource.dart';
-import 'package:ordinario_chanortiz_movilhibrido/src/domain/usecases/countries/get_all_countries_usecase.dart';
-import 'package:ordinario_chanortiz_movilhibrido/src/data/repositories_impl/country_repository_impl.dart';
-import 'package:ordinario_chanortiz_movilhibrido/src/data/datasources/remote/countries_api_datasource.dart';
+
+import '../../controllers/countries_controller.dart';
+import '../../controllers/favorites_controller.dart';
+import '../../../data/datasources/local/favorites_local_datasource.dart';
+import '../../../data/datasources/local/deleted_countries_local_datasource.dart';
+import '../../../domain/usecases/countries/get_all_countries_usecase.dart';
+import '../../../data/repositories_impl/country_repository_impl.dart';
+import '../../../data/datasources/remote/countries_api_datasource.dart';
+import '../../../data/datasources/local/custom_countries_local_datasource.dart';
+import '../../../data/models/custom_country_model.dart';
 import 'country_details_page.dart';
+import 'custom_country_details_page.dart';
 
 class CountriesListPage extends StatefulWidget {
   const CountriesListPage({super.key});
@@ -22,6 +26,9 @@ class _CountriesListPageState extends State<CountriesListPage> {
   final deletedDataSource = DeletedCountriesLocalDataSource();
   List<String> deletedCountries = [];
 
+  final customDataSource = CustomCountriesLocalDataSource();
+  List<CustomCountryModel> customCountries = [];
+
   final Color accentColor = const Color(0xFFF2994A);
   final Color darkGlassColor = const Color(0xFF1A2A33).withValues(alpha: 0.95);
 
@@ -36,6 +43,7 @@ class _CountriesListPageState extends State<CountriesListPage> {
     controller.loadCountries();
     Future.microtask(() async {
       deletedCountries = await deletedDataSource.getDeleted();
+      customCountries = await customDataSource.getCountries();
       setState(() {});
     });
   }
@@ -116,18 +124,33 @@ class _CountriesListPageState extends State<CountriesListPage> {
                         return _buildEmptyView();
                       }
 
+                      final combined = [
+                        ...controller.filteredCountries,
+                        ...customCountries,
+                      ];
                       return ListView.builder(
                         padding: const EdgeInsets.symmetric(
                           horizontal: 20,
                           vertical: 10,
                         ),
                         physics: const BouncingScrollPhysics(),
-                        itemCount: controller.filteredCountries.length,
+                        itemCount: combined.length,
                         itemBuilder: (context, index) {
-                          final country = controller.filteredCountries[index];
-                          if (deletedCountries.contains(country.cca2)) {
-                            return const SizedBox.shrink();
+                          final country = combined[index];
+
+                          // Skip deleted ones (only API countries)
+                          if (country is! CustomCountryModel) {
+                            final apiCountry = country as dynamic;
+                            if (deletedCountries.contains(apiCountry.cca2)) {
+                              return const SizedBox.shrink();
+                            }
                           }
+
+                          // Custom country rendered differently
+                          if (country is CustomCountryModel) {
+                            return _buildCustomCountryItem(country);
+                          }
+
                           return _buildCountryItem(country);
                         },
                       );
@@ -336,6 +359,94 @@ class _CountriesListPageState extends State<CountriesListPage> {
                     color: isFav ? Colors.redAccent : Colors.white38,
                   ),
                   onPressed: () => favController.toggleFavorite(country.cca2),
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildCustomCountryItem(CustomCountryModel c) {
+    bool isFav = favController.isFavorite(c.id);
+
+    return Material(
+      color: Colors.transparent,
+      child: InkWell(
+        borderRadius: BorderRadius.circular(16),
+        onTap: () {
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (_) => CustomCountryDetailsPage(country: c),
+            ),
+          );
+        },
+        child: Container(
+          margin: const EdgeInsets.only(bottom: 15),
+          decoration: BoxDecoration(
+            color: Colors.white.withValues(alpha: 0.08),
+            borderRadius: BorderRadius.circular(16),
+            border: Border.all(color: Colors.white.withValues(alpha: 0.15)),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withValues(alpha: 0.1),
+                blurRadius: 10,
+                offset: const Offset(0, 4),
+              ),
+            ],
+          ),
+          child: Padding(
+            padding: const EdgeInsets.all(12.0),
+            child: Row(
+              children: [
+                Container(
+                  width: 60,
+                  height: 40,
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(8),
+                    image: DecorationImage(
+                      image: NetworkImage(c.flagUrl),
+                      fit: BoxFit.cover,
+                    ),
+                  ),
+                ),
+                const SizedBox(width: 15),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        c.name,
+                        style: const TextStyle(
+                          color: Colors.white,
+                          fontSize: 16,
+                          fontWeight: FontWeight.w600,
+                        ),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                      const SizedBox(height: 4),
+                      Row(
+                        children: [
+                          Icon(Icons.public, size: 12, color: accentColor),
+                          const SizedBox(width: 4),
+                          Text(
+                            c.region,
+                            style: TextStyle(color: accentColor, fontSize: 12),
+                          ),
+                        ],
+                      ),
+                    ],
+                  ),
+                ),
+                IconButton(
+                  icon: Icon(
+                    isFav ? Icons.favorite : Icons.favorite_border,
+                    color: isFav ? Colors.redAccent : Colors.white38,
+                  ),
+                  onPressed: () => favController.toggleFavorite(c.id),
                 ),
               ],
             ),

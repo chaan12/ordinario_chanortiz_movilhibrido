@@ -8,14 +8,11 @@ class CountryEntity {
   final double area;
   final List<String> timezones;
 
-  // Flags
   final String flagPng;
   final String flagSvg;
 
-  // Map
   final String mapUrl;
 
-  // Otros datos
   final Map<String, dynamic> languages;
   final Map<String, dynamic> currencies;
 

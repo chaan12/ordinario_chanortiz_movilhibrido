@@ -4,7 +4,7 @@ import '../../../domain/usecases/auth/login_usecase.dart';
 import '../../../data/repositories_impl/auth_repository_impl.dart';
 import '../../../data/datasources/remote/login_api_datasource.dart';
 import '../home/home_page.dart';
-import '../admin/admin_dashboard_page.dart';
+import '../admin/admin_home_page.dart';
 
 class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
@@ -54,7 +54,7 @@ class _LoginPageState extends State<LoginPage> {
     if (role == "admin") {
       Navigator.pushReplacement(
         context,
-        MaterialPageRoute(builder: (_) => const AdminDashboardPage()),
+        MaterialPageRoute(builder: (_) => const AdminHomePage()),
       );
       return;
     }

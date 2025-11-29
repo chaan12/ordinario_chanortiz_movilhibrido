@@ -1,7 +1,7 @@
-import 'package:ordinario_chanortiz_movilhibrido/src/data/datasources/remote/countries_api_datasource.dart';
-import 'package:ordinario_chanortiz_movilhibrido/src/domain/entities/country_entity.dart';
-import 'package:ordinario_chanortiz_movilhibrido/src/domain/repositories/country_repository.dart';
-import 'package:ordinario_chanortiz_movilhibrido/src/presentation/adapters/country_adapter.dart';
+import '../../data/datasources/remote/countries_api_datasource.dart';
+import '../../domain/entities/country_entity.dart';
+import '../../domain/repositories/country_repository.dart';
+import '../../presentation/adapters/country_adapter.dart';
 
 class CountryRepositoryImpl implements CountryRepository {
   final CountriesApiDataSource dataSource;

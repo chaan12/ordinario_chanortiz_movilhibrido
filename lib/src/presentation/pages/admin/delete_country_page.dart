@@ -1,10 +1,11 @@
 import 'package:flutter/material.dart';
-import 'package:ordinario_chanortiz_movilhibrido/src/presentation/controllers/countries_controller.dart';
-import 'package:ordinario_chanortiz_movilhibrido/src/presentation/controllers/deleted_countries_controller.dart';
-import 'package:ordinario_chanortiz_movilhibrido/src/data/datasources/local/deleted_countries_local_datasource.dart';
-import 'package:ordinario_chanortiz_movilhibrido/src/data/datasources/remote/countries_api_datasource.dart';
-import 'package:ordinario_chanortiz_movilhibrido/src/data/repositories_impl/country_repository_impl.dart';
-import 'package:ordinario_chanortiz_movilhibrido/src/domain/usecases/countries/get_all_countries_usecase.dart';
+
+import '../../controllers/countries_controller.dart';
+import '../../controllers/deleted_countries_controller.dart';
+import '../../../data/datasources/local/deleted_countries_local_datasource.dart';
+import '../../../data/datasources/remote/countries_api_datasource.dart';
+import '../../../data/repositories_impl/country_repository_impl.dart';
+import '../../../domain/usecases/countries/get_all_countries_usecase.dart';
 
 class DeleteCountryPage extends StatefulWidget {
   const DeleteCountryPage({super.key});

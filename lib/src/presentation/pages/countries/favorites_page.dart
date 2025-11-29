@@ -1,14 +1,15 @@
 import 'package:flutter/material.dart';
-
 import '../../../data/datasources/local/favorites_local_datasource.dart';
 import '../../../data/datasources/remote/countries_api_datasource.dart';
 import '../../../data/repositories_impl/country_repository_impl.dart';
-
 import '../../../domain/usecases/countries/get_all_countries_usecase.dart';
-
+import '../../../data/datasources/local/custom_countries_local_datasource.dart';
+import '../../../data/models/custom_country_model.dart';
+import '../../../domain/entities/country_entity.dart';
 import '../../controllers/favorites_controller.dart';
 import '../../controllers/countries_controller.dart';
 import 'country_details_page.dart';
+import 'custom_country_details_page.dart';
 
 class FavoritesPage extends StatefulWidget {
   const FavoritesPage({super.key});
@@ -20,6 +21,9 @@ class FavoritesPage extends StatefulWidget {
 class _FavoritesPageState extends State<FavoritesPage> {
   late FavoritesController favController;
   late CountriesController countriesController;
+
+  late CustomCountriesLocalDataSource customDataSource;
+  List<CustomCountryModel> customCountries = [];
 
   final Color accentColor = const Color(0xFFF2994A);
   final Color darkBackgroundColor = const Color(0xFF0F2027);
@@ -35,6 +39,14 @@ class _FavoritesPageState extends State<FavoritesPage> {
 
     favController.loadFavorites();
     countriesController.loadCountries();
+
+    customDataSource = CustomCountriesLocalDataSource();
+    _loadCustomCountries();
+  }
+
+  Future<void> _loadCustomCountries() async {
+    customCountries = await customDataSource.getCountries();
+    setState(() {});
   }
 
   @override
@@ -105,13 +117,37 @@ class _FavoritesPageState extends State<FavoritesPage> {
                 );
               }
 
-              final favoriteCountries = countries
-                  .where((c) => favorites.contains(c.cca2))
-                  .toList();
+              final favoriteApiCountries = countries.where((c) => favorites.contains(c.cca2)).toList();
+              final favoriteCustomCountries = customCountries.where((c) => favorites.contains(c.id)).toList();
 
-              if (favoriteCountries.isEmpty && countries.isNotEmpty) {
+              // Combine both
+              final allFavoriteCountries = [...favoriteApiCountries, ...favoriteCustomCountries];
+
+              // Si los países aún no cargan → loading real
+              if (countries.isEmpty) {
                 return const Center(
                   child: CircularProgressIndicator(color: Colors.white),
+                );
+              }
+
+              // Si ya cargaron y no hay favoritos → mensaje amigable
+              if (allFavoriteCountries.isEmpty) {
+                return Center(
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Icon(
+                        Icons.favorite_border,
+                        size: 60,
+                        color: Colors.white54,
+                      ),
+                      const SizedBox(height: 20),
+                      const Text(
+                        "Aún no tienes favoritos",
+                        style: TextStyle(fontSize: 18, color: Colors.white70),
+                      ),
+                    ],
+                  ),
                 );
               }
 
@@ -123,19 +159,28 @@ class _FavoritesPageState extends State<FavoritesPage> {
                   mainAxisSpacing: 15,
                   childAspectRatio: 0.8,
                 ),
-                itemCount: favoriteCountries.length,
+                itemCount: allFavoriteCountries.length,
                 physics: const BouncingScrollPhysics(),
                 itemBuilder: (context, index) {
-                  final c = favoriteCountries[index];
+                  final item = allFavoriteCountries[index];
 
                   return GestureDetector(
                     onTap: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (_) => CountryDetailsPage(cca2: c.cca2),
-                        ),
-                      );
+                      if (item is CustomCountryModel) {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (_) => CustomCountryDetailsPage(country: item),
+                          ),
+                        );
+                      } else if (item is CountryEntity) {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (_) => CountryDetailsPage(cca2: item.cca2),
+                          ),
+                        );
+                      }
                     },
                     child: Container(
                       decoration: BoxDecoration(
@@ -166,7 +211,7 @@ class _FavoritesPageState extends State<FavoritesPage> {
                                     ),
                                     image: DecorationImage(
                                       // CORRECCIÓN AQUÍ: flagPng en lugar de flag
-                                      image: NetworkImage(c.flagPng),
+                                      image: NetworkImage(item is CustomCountryModel ? item.flagUrl : (item as CountryEntity).flagPng),
                                       fit: BoxFit.cover,
                                     ),
                                   ),
@@ -199,7 +244,7 @@ class _FavoritesPageState extends State<FavoritesPage> {
                                 mainAxisAlignment: MainAxisAlignment.center,
                                 children: [
                                   Text(
-                                    c.name,
+                                    item is CustomCountryModel ? item.name : (item as CountryEntity).name,
                                     style: const TextStyle(
                                       color: Colors.white,
                                       fontWeight: FontWeight.bold,
@@ -210,7 +255,7 @@ class _FavoritesPageState extends State<FavoritesPage> {
                                   ),
                                   const SizedBox(height: 4),
                                   Text(
-                                    c.region,
+                                    item is CustomCountryModel ? item.region : (item as CountryEntity).region,
                                     style: TextStyle(
                                       color: accentColor,
                                       fontSize: 9,

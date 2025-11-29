@@ -1,5 +1,6 @@
-import 'package:ordinario_chanortiz_movilhibrido/src/data/models/country_model.dart';
-import 'package:ordinario_chanortiz_movilhibrido/src/domain/entities/country_entity.dart';
+
+import '../../data/models/country_model.dart';
+import '../../domain/entities/country_entity.dart';
 
 class CountryAdapter {
   static CountryEntity fromModel(CountryModel model) {

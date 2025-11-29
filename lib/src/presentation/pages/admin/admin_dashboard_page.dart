@@ -1,10 +1,13 @@
 import 'package:flutter/material.dart';
-import 'package:ordinario_chanortiz_movilhibrido/src/presentation/controllers/countries_controller.dart';
-import 'package:ordinario_chanortiz_movilhibrido/src/presentation/controllers/favorites_controller.dart';
-import 'package:ordinario_chanortiz_movilhibrido/src/data/datasources/remote/countries_api_datasource.dart';
-import 'package:ordinario_chanortiz_movilhibrido/src/data/datasources/local/favorites_local_datasource.dart';
-import 'package:ordinario_chanortiz_movilhibrido/src/domain/usecases/countries/get_all_countries_usecase.dart';
-import 'package:ordinario_chanortiz_movilhibrido/src/data/repositories_impl/country_repository_impl.dart';
+
+import '../../controllers/countries_controller.dart';
+import '../../controllers/favorites_controller.dart';
+import '../../../data/datasources/remote/countries_api_datasource.dart';
+import '../../../data/datasources/local/favorites_local_datasource.dart';
+import '../../../domain/usecases/countries/get_all_countries_usecase.dart';
+import '../../../data/repositories_impl/country_repository_impl.dart';
+import '../../controllers/custom_countries_controller.dart';
+import '../../../data/datasources/local/custom_countries_local_datasource.dart';
 
 class AdminDashboardPage extends StatefulWidget {
   const AdminDashboardPage({super.key});
@@ -16,8 +19,7 @@ class AdminDashboardPage extends StatefulWidget {
 class _AdminDashboardPageState extends State<AdminDashboardPage> {
   late CountriesController countriesController;
   late FavoritesController favoritesController;
-
-  List<String> deletedCountries = [];
+  late CustomCountriesController customController;
 
   final Color accentColor = const Color(0xFFF2994A);
 
@@ -28,8 +30,13 @@ class _AdminDashboardPageState extends State<AdminDashboardPage> {
       GetAllCountriesUseCase(CountryRepositoryImpl(CountriesApiDataSource())),
     );
     favoritesController = FavoritesController(FavoritesLocalDataSource());
+    customController = CustomCountriesController(
+      CustomCountriesLocalDataSource(),
+    );
+
     countriesController.loadCountries();
     favoritesController.loadFavorites();
+    customController.loadCountries();
   }
 
   int countLanguages() {
@@ -71,6 +78,7 @@ class _AdminDashboardPageState extends State<AdminDashboardPage> {
       ),
       body: Stack(
         children: [
+          // 1. FONDO
           Positioned.fill(
             child: Image.network(
               'https://images.unsplash.com/photo-1451187580459-43490279c0fa?q=80&w=2072&auto=format&fit=crop',
@@ -93,132 +101,78 @@ class _AdminDashboardPageState extends State<AdminDashboardPage> {
             ),
           ),
 
+          // 2. CONTENIDO
           SafeArea(
             child: AnimatedBuilder(
               animation: Listenable.merge([
                 countriesController,
                 favoritesController,
+                customController,
               ]),
               builder: (context, _) {
                 final totalCountries = countriesController.allCountries.length;
+                final totalCreated = customController.customCountries.length;
                 final totalFavorites = favoritesController.favorites.length;
                 final totalLanguages = countLanguages();
                 final totalRegions = countRegions();
-                final totalDeleted = deletedCountries.length;
 
                 return ListView(
-                  padding: const EdgeInsets.fromLTRB(20, 10, 20, 120),
+                  padding: const EdgeInsets.fromLTRB(20, 10, 20, 100),
                   physics: const BouncingScrollPhysics(),
                   children: [
-                    _buildSectionTitle("Resumen General"),
+                    _buildSectionTitle("Vista General"),
                     _buildHeroCard(
                       label: "Total de Países",
                       value: "$totalCountries",
                       icon: Icons.public,
                     ),
-                    const SizedBox(height: 20),
+                    const SizedBox(height: 25),
 
-                    _buildSectionTitle("Métricas Detalladas"),
+                    _buildSectionTitle("Métricas del Sistema"),
+
                     GridView.count(
                       crossAxisCount: 2,
                       crossAxisSpacing: 15,
                       mainAxisSpacing: 15,
                       shrinkWrap: true,
                       physics: const NeverScrollableScrollPhysics(),
-                      childAspectRatio: 1.1,
+                      // AQUÍ ESTÁ EL ARREGLO DEL OVERFLOW:
+                      // 0.85 hace las tarjetas más altas verticalmente
+                      childAspectRatio: 0.85,
                       children: [
+                        _buildSmallStatCard(
+                          icon: Icons.add_location_alt,
+                          value: "$totalCreated",
+                          label: "Creados manualmente",
+                          color: Colors.greenAccent,
+                        ),
                         _buildSmallStatCard(
                           icon: Icons.map,
                           value: "$totalRegions",
-                          label: "Regiones",
+                          label: "Regiones globales",
                           color: Colors.blueAccent,
                         ),
                         _buildSmallStatCard(
                           icon: Icons.translate,
                           value: "$totalLanguages",
-                          label: "Idiomas",
+                          label: "Idiomas registrados",
                           color: Colors.purpleAccent,
                         ),
                         _buildSmallStatCard(
                           icon: Icons.favorite,
                           value: "$totalFavorites",
-                          label: "Favoritos",
+                          label: "Favoritos totales",
                           color: Colors.pinkAccent,
-                        ),
-                        _buildSmallStatCard(
-                          icon: Icons.delete_outline,
-                          value: "$totalDeleted",
-                          label: "Eliminados",
-                          color: Colors.orangeAccent,
-                          isWarning: true,
                         ),
                       ],
                     ),
-                    const SizedBox(height: 30),
 
-                    _buildSectionTitle("Acciones Administrativas"),
-                    _buildWideActionCard(
-                      icon: Icons.settings_backup_restore,
-                      title: "Gestión de Eliminación",
-                      subtitle: "Restaurar o eliminar países permanentemente",
-                      onTap: () {
-                        Navigator.pushNamed(context, "/delete_country");
-                      },
-                    ),
+                    const SizedBox(height: 40),
+
+                    _buildLogoutButton(context),
                   ],
                 );
               },
-            ),
-          ),
-
-          Positioned(
-            bottom: 30,
-            left: 20,
-            right: 20,
-            child: Container(
-              height: 55,
-              decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(15),
-                boxShadow: [
-                  BoxShadow(
-                    color: Colors.red.withValues(alpha: 0.3),
-                    blurRadius: 15,
-                    offset: const Offset(0, 8),
-                  ),
-                ],
-                gradient: LinearGradient(
-                  colors: [Colors.red.shade900, Colors.red.shade700],
-                ),
-              ),
-              child: Material(
-                color: Colors.transparent,
-                child: InkWell(
-                  borderRadius: BorderRadius.circular(15),
-                  onTap: () {
-                    Navigator.pushNamedAndRemoveUntil(
-                      context,
-                      "/login",
-                      (route) => false,
-                    );
-                  },
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: const [
-                      Icon(Icons.logout, color: Colors.white),
-                      SizedBox(width: 10),
-                      Text(
-                        "CERRAR SESIÓN",
-                        style: TextStyle(
-                          color: Colors.white,
-                          fontWeight: FontWeight.bold,
-                          fontSize: 16,
-                          letterSpacing: 1,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ),
             ),
           ),
         ],
@@ -226,9 +180,11 @@ class _AdminDashboardPageState extends State<AdminDashboardPage> {
     );
   }
 
+  // --- WIDGETS DE UI ---
+
   Widget _buildSectionTitle(String title) {
     return Padding(
-      padding: const EdgeInsets.only(bottom: 10, left: 5),
+      padding: const EdgeInsets.only(bottom: 12, left: 5),
       child: Text(
         title.toUpperCase(),
         style: TextStyle(
@@ -249,45 +205,60 @@ class _AdminDashboardPageState extends State<AdminDashboardPage> {
     return Container(
       padding: const EdgeInsets.all(25),
       decoration: BoxDecoration(
-        color: Colors.white.withValues(alpha: 0.1),
-        borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: Colors.white.withValues(alpha: 0.2)),
+        color: Colors.white.withValues(alpha: 0.08),
+        borderRadius: BorderRadius.circular(24),
+        border: Border.all(color: Colors.white.withValues(alpha: 0.15)),
         boxShadow: [
           BoxShadow(
             color: Colors.black.withValues(alpha: 0.2),
-            blurRadius: 15,
-            offset: const Offset(0, 5),
+            blurRadius: 20,
+            offset: const Offset(0, 10),
           ),
         ],
       ),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                value,
-                style: const TextStyle(
-                  color: Colors.white,
-                  fontSize: 42,
-                  fontWeight: FontWeight.bold,
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  value,
+                  style: const TextStyle(
+                    color: Colors.white,
+                    fontSize: 42,
+                    fontWeight: FontWeight.bold,
+                    height: 1.0,
+                  ),
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
                 ),
-              ),
-              Text(
-                label,
-                style: const TextStyle(color: Colors.white70, fontSize: 16),
-              ),
-            ],
+                const SizedBox(height: 5),
+                Text(
+                  label,
+                  style: TextStyle(
+                    color: Colors.white.withValues(alpha: 0.6),
+                    fontSize: 16,
+                    fontWeight: FontWeight.w500,
+                  ),
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                ),
+              ],
+            ),
           ),
           Container(
-            padding: const EdgeInsets.all(15),
+            padding: const EdgeInsets.all(18),
             decoration: BoxDecoration(
-              color: accentColor.withValues(alpha: 0.2),
+              color: accentColor.withValues(alpha: 0.15),
               shape: BoxShape.circle,
-              border: Border.all(color: accentColor.withValues(alpha: 0.5)),
+              border: Border.all(color: accentColor.withValues(alpha: 0.3)),
+              boxShadow: [
+                BoxShadow(color: accentColor.withValues(alpha: 0.2), blurRadius: 15),
+              ],
             ),
-            child: Icon(icon, color: accentColor, size: 35),
+            child: Icon(icon, color: accentColor, size: 32),
           ),
         ],
       ),
@@ -299,97 +270,105 @@ class _AdminDashboardPageState extends State<AdminDashboardPage> {
     required String value,
     required String label,
     required Color color,
-    bool isWarning = false,
   }) {
     return Container(
-      padding: const EdgeInsets.all(15),
+      padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
         color: Colors.white.withValues(alpha: 0.05),
         borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: Colors.white.withValues(alpha: 0.1)),
+        border: Border.all(color: Colors.white.withValues(alpha: 0.08)),
       ),
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Icon(icon, color: isWarning ? Colors.redAccent : color, size: 28),
-          const SizedBox(height: 10),
-          Text(
-            value,
-            style: const TextStyle(
-              color: Colors.white,
-              fontSize: 24,
-              fontWeight: FontWeight.bold,
+          Container(
+            padding: const EdgeInsets.all(10),
+            decoration: BoxDecoration(
+              color: color.withValues(alpha: 0.15),
+              shape: BoxShape.circle,
+            ),
+            child: Icon(icon, color: color, size: 24),
+          ),
+          const SizedBox(height: 8),
+
+          // FittedBox ayuda a que el número no desborde si es muy grande
+          FittedBox(
+            fit: BoxFit.scaleDown,
+            child: Text(
+              value,
+              style: const TextStyle(
+                color: Colors.white,
+                fontSize: 26,
+                fontWeight: FontWeight.bold,
+              ),
             ),
           ),
+
+          const SizedBox(height: 4),
           Text(
             label,
+            textAlign: TextAlign.center,
             style: TextStyle(
               color: Colors.white.withValues(alpha: 0.5),
-              fontSize: 12,
+              fontSize: 11,
             ),
+            maxLines: 2,
+            overflow: TextOverflow.ellipsis,
           ),
         ],
       ),
     );
   }
 
-  Widget _buildWideActionCard({
-    required IconData icon,
-    required String title,
-    required String subtitle,
-    required VoidCallback onTap,
-  }) {
+  Widget _buildLogoutButton(BuildContext context) {
     return Container(
+      margin: const EdgeInsets.symmetric(horizontal: 10),
       decoration: BoxDecoration(
-        color: Colors.white.withValues(alpha: 0.05),
-        borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: Colors.white.withValues(alpha: 0.1)),
+        borderRadius: BorderRadius.circular(16),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.redAccent.withValues(alpha: 0.2),
+            blurRadius: 15,
+            offset: const Offset(0, 5),
+          ),
+        ],
       ),
       child: Material(
         color: Colors.transparent,
         child: InkWell(
-          borderRadius: BorderRadius.circular(20),
-          onTap: onTap,
-          child: Padding(
-            padding: const EdgeInsets.all(20),
+          onTap: () {
+            Navigator.pushNamedAndRemoveUntil(
+              context,
+              "/login",
+              (route) => false,
+            );
+          },
+          borderRadius: BorderRadius.circular(16),
+          child: Container(
+            padding: const EdgeInsets.symmetric(vertical: 18),
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(16),
+              border: Border.all(color: Colors.redAccent.withValues(alpha: 0.5)),
+              gradient: LinearGradient(
+                colors: [
+                  Colors.red.withValues(alpha: 0.2),
+                  Colors.red.withValues(alpha: 0.05),
+                ],
+              ),
+            ),
             child: Row(
-              children: [
-                Container(
-                  padding: const EdgeInsets.all(12),
-                  decoration: BoxDecoration(
-                    color: Colors.white.withValues(alpha: 0.05),
-                    borderRadius: BorderRadius.circular(12),
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: const [
+                Icon(Icons.logout_rounded, color: Colors.redAccent),
+                SizedBox(width: 12),
+                Text(
+                  "Cerrar Sesión",
+                  style: TextStyle(
+                    color: Colors.redAccent,
+                    fontWeight: FontWeight.bold,
+                    fontSize: 16,
+                    letterSpacing: 1,
                   ),
-                  child: Icon(icon, color: Colors.white, size: 24),
-                ),
-                const SizedBox(width: 15),
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        title,
-                        style: const TextStyle(
-                          color: Colors.white,
-                          fontSize: 16,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                      const SizedBox(height: 4),
-                      Text(
-                        subtitle,
-                        style: TextStyle(
-                          color: Colors.white.withValues(alpha: 0.5),
-                          fontSize: 12,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-                const Icon(
-                  Icons.arrow_forward_ios,
-                  color: Colors.white38,
-                  size: 14,
                 ),
               ],
             ),

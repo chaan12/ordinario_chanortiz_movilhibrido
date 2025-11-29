@@ -1,5 +1,5 @@
-import 'package:ordinario_chanortiz_movilhibrido/src/domain/entities/country_entity.dart';
-import 'package:ordinario_chanortiz_movilhibrido/src/domain/repositories/country_repository.dart';
+import '../../../domain/entities/country_entity.dart';
+import '../../../domain/repositories/country_repository.dart';
 
 class GetCountryDetailsUseCase {
   final CountryRepository repository;

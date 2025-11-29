@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:ordinario_chanortiz_movilhibrido/src/presentation/controllers/country_details_controller.dart';
-import 'package:ordinario_chanortiz_movilhibrido/src/domain/usecases/countries/get_country_details_usecase.dart';
-import 'package:ordinario_chanortiz_movilhibrido/src/data/repositories_impl/country_repository_impl.dart';
-import 'package:ordinario_chanortiz_movilhibrido/src/data/datasources/remote/countries_api_datasource.dart';
+import '../../controllers/country_details_controller.dart';
+import '../../../domain/usecases/countries/get_country_details_usecase.dart';
+import '../../../data/repositories_impl/country_repository_impl.dart';
+import '../../../data/datasources/remote/countries_api_datasource.dart';
 
 class CountryDetailsPage extends StatefulWidget {
   final String cca2;

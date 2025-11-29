@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:ordinario_chanortiz_movilhibrido/src/data/datasources/local/favorites_local_datasource.dart';
+
+import '../../data/datasources/local/favorites_local_datasource.dart';
 
 class FavoritesController extends ChangeNotifier {
   final FavoritesLocalDataSource dataSource;
