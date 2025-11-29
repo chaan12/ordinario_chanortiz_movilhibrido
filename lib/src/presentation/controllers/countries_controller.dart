@@ -10,15 +10,15 @@ class CountriesController extends ChangeNotifier {
   bool isLoading = false;
   String? errorMessage;
 
-  List<CountryEntity> allCountries = []; // lista original completa
-  List<CountryEntity> filteredCountries = []; // lista filtrada
+  List<CountryEntity> allCountries = [];
+  List<CountryEntity> filteredCountries = []; 
 
   String searchQuery = "";
   List<String> selectedRegions = [];
   List<String> selectedLanguages = [];
   List<String> selectedCurrencies = [];
 
-  String orderBy = "name"; // name | area
+  String orderBy = "name";
 
   Future<void> loadCountries() async {
     isLoading = true;
@@ -105,5 +105,78 @@ class CountriesController extends ChangeNotifier {
     }
 
     notifyListeners();
+  }
+  Map<String, int> getCountriesPerRegion() {
+    final Map<String, int> result = {
+      "Africa": 0,
+      "Americas": 0,
+      "Asia": 0,
+      "Europe": 0,
+      "Oceania": 0,
+      "Other": 0,
+    };
+
+    for (final c in allCountries) {
+      final region = c.region;
+      if (result.containsKey(region)) {
+        result[region] = result[region]! + 1;
+      } else {
+        result["Other"] = result["Other"]! + 1;
+      }
+    }
+
+    return result;
+  }
+
+  Map<String, int> getLanguagesPerRegion() {
+    final Map<String, Set<String>> langsPerRegion = {
+      "Africa": {},
+      "Americas": {},
+      "Asia": {},
+      "Europe": {},
+      "Oceania": {},
+      "Other": {},
+    };
+
+    for (final c in allCountries) {
+      final region = langsPerRegion.containsKey(c.region) ? c.region : "Other";
+      c.languages.forEach((code, name) {
+        langsPerRegion[region]!.add(code);
+      });
+    }
+
+    return langsPerRegion.map((key, value) => MapEntry(key, value.length));
+  }
+
+  Map<String, int> getTopLanguages({int top = 5}) {
+    final Map<String, int> count = {};
+
+    for (final c in allCountries) {
+      c.languages.forEach((code, name) {
+        count[code] = (count[code] ?? 0) + 1;
+      });
+    }
+
+    final entries = count.entries.toList()
+      ..sort((a, b) => b.value.compareTo(a.value));
+
+    final topEntries = entries.take(top);
+    return {for (var e in topEntries) e.key: e.value};
+  }
+
+  Map<String, int> getTopCurrencies({int top = 5}) {
+    final Map<String, int> count = {};
+
+    for (final c in allCountries) {
+      c.currencies.forEach((code, name) {
+        count[code] = (count[code] ?? 0) + 1;
+      });
+    }
+
+    final entries = count.entries.toList()
+      ..sort((a, b) => b.value.compareTo(a.value));
+
+    final topEntries = entries.take(top);
+    return {for (var e in topEntries) e.key: e.value};
   }
 }

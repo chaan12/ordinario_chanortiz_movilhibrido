@@ -57,7 +57,7 @@ class _AdminDashboardPageState extends State<AdminDashboardPage> {
       extendBodyBehindAppBar: true,
       appBar: AppBar(
         title: const Text(
-          "Dashboard Global",
+          "Dashboard global",
           style: TextStyle(
             color: Colors.white,
             fontWeight: FontWeight.bold,

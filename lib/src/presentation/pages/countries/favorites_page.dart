@@ -44,7 +44,7 @@ class _FavoritesPageState extends State<FavoritesPage> {
       extendBodyBehindAppBar: true,
       appBar: AppBar(
         title: const Text(
-          'Mi Colección',
+          'Mi colección',
           style: TextStyle(
             color: Colors.white,
             fontWeight: FontWeight.bold,

@@ -43,7 +43,7 @@ class _DeleteCountryPageState extends State<DeleteCountryPage> {
       extendBodyBehindAppBar: true,
       appBar: AppBar(
         title: const Text(
-          "Gestión de Eliminación",
+          "Gestión de eliminación",
           style: TextStyle(
             color: Colors.white,
             fontWeight: FontWeight.bold,

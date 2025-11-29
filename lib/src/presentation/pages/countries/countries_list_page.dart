@@ -56,7 +56,7 @@ class _CountriesListPageState extends State<CountriesListPage> {
         elevation: 0,
         centerTitle: true,
         title: const Text(
-          'Destinos del Mundo',
+          'Destinos del mundo',
           style: TextStyle(
             color: Colors.white,
             fontWeight: FontWeight.bold,

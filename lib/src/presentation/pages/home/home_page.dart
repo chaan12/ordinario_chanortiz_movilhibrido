@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import '../countries/countries_list_page.dart';
 import '../countries/favorites_page.dart';
 import '../user/user_profile_page.dart';
+import '../stats/stats_page.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -16,6 +17,7 @@ class _HomePageState extends State<HomePage> {
   final List<Widget> pages = const [
     CountriesListPage(),
     FavoritesPage(),
+    StatsPage(),
     UserProfilePage(),
   ];
 
@@ -58,7 +60,13 @@ class _HomePageState extends State<HomePage> {
                 Icons.favorite_border,
                 "Favoritos",
               ),
-              _buildNavItem(2, 
+              _buildNavItem(
+                2,
+                Icons.bar_chart,
+                Icons.bar_chart_outlined,
+                "Stats",
+              ),
+              _buildNavItem(3, 
               Icons.person, 
               Icons.person_outline, 
               "Perfil"),

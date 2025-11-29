@@ -177,7 +177,7 @@ class UserProfilePage extends StatelessWidget {
       extendBodyBehindAppBar: true,
       appBar: AppBar(
         title: const Text(
-          "Pasaporte Digital",
+          "Pasaporte digital",
           style: TextStyle(
             color: Colors.white, 
             fontWeight: FontWeight.bold,
