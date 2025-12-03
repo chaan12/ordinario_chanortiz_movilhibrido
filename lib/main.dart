@@ -3,8 +3,11 @@ import 'src/presentation/pages/home/home_page.dart';
 import 'src/presentation/pages/login/login_page.dart';
 import 'src/presentation/pages/user/user_profile_page.dart';
 import 'src/presentation/pages/admin/delete_country_page.dart';
+import 'src/data/datasources/local/favorites_local_datasource.dart';
 
-void main() {
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  await FavoritesLocalDataSource().clearFavorites();
   runApp(const MyApp());
 }
 
